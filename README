@@ -1,0 +1,29 @@
+---- July 21, 2011 ----
+
+domain_wall.py -
+    Definitions involving gamma matrices, projectors, and momentum.
+
+pyNPR.py -
+    NPR data structures.
+
+measurements.py -
+    NPR projections.
+
+fits.py -
+    Chiral fits.
+
+step-scaling.py -
+    Calculating step-scaling functions.
+
+matching.py -
+    Definitions of matching/running factors for NPR.
+
+DSDR_analysis.py -
+    Main driver for NPR analysis on DSDR lattices.
+
+IW_analysis.py -
+    Main driver for NPR analysis on IW lattices.
+
+combined_analysis.py -
+    DSDR Zs + IW step-scaling + NDR matching.
+
