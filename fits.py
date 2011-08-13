@@ -17,29 +17,12 @@ def line_fit_2ptData(Data1, Data2):
     mres = Data1.mres
     result = Data1.__class__(-mres, Data1.p, Data1.tw, None)
 
-    # (g, g) - scheme
-    p1 = (Data1.m + mres, Data1.fourquark_Zs, Data1.fourquark_sigmaJK)
-    p2 = (Data2.m + mres, Data2.fourquark_Zs, Data2.fourquark_sigmaJK)
-    result.fourquark_Zs = line_fit([p1, p2])[0]
-    result.fourquark_sigmaJK = line_fit([p1, p2])[1] # inefficient
-
-    # (g, q) - scheme
-    p1 = (Data1.m + mres, Data1.fourquark_Zs_q, Data1.fourquark_sigmaJK_q)
-    p2 = (Data2.m + mres, Data2.fourquark_Zs_q, Data2.fourquark_sigmaJK_q)
-    result.fourquark_Zs_q = line_fit([p1, p2])[0]
-    result.fourquark_sigmaJK_q = line_fit([p1, p2])[1] # inefficient
-    
-    # (q, g) - scheme
-    p1 = (Data1.m + mres, Data1.fourquark_Zs_qg, Data1.fourquark_sigmaJK_qg)
-    p2 = (Data2.m + mres, Data2.fourquark_Zs_qg, Data2.fourquark_sigmaJK_qg)
-    result.fourquark_Zs_qg = line_fit([p1, p2])[0]
-    result.fourquark_sigmaJK_qg = line_fit([p1, p2])[1] # inefficient
-
-    # (q, q) - scheme
-    p1 = (Data1.m + mres, Data1.fourquark_Zs_qq, Data1.fourquark_sigmaJK_qq)
-    p2 = (Data2.m + mres, Data2.fourquark_Zs_qq, Data2.fourquark_sigmaJK_qq)
-    result.fourquark_Zs_qq = line_fit([p1, p2])[0]
-    result.fourquark_sigmaJK_qq = line_fit([p1, p2])[1] # inefficient
+    result.fourquark_Zs = {} #argument for putting these in class def?
+    result.fourquark_sigmaJK = {}
+    for s in 'gg', 'gq', 'qg', 'qq':
+        p1 = (Data1.m + mres, Data1.fourquark_Zs[s], Data1.fourquark_sigmaJK[s])
+        p2 = (Data2.m + mres, Data2.fourquark_Zs[s], Data2.fourquark_sigmaJK[s])
+        result.fourquark_Zs[s], result.fourquark_sigmaJK[s] = line_fit([p1, p2])
 
     return result
 
@@ -54,26 +37,13 @@ def line_fit_Data(*Dat):
     mres = d0.mres
     result = d0.__class__(-mres, d0.p, d0.tw, None)
     
-    # (g, g) - scheme
-    points = [(d.m + mres, d.fourquark_Zs, d.fourquark_sigmaJK)
-              for d in Dat]
-    result.fourquark_Zs, result.fourquark_sigmaJK = line_fit(points)
+    result.fourquark_Zs = {} #argument for putting these in class def?
+    result.fourquark_sigmaJK = {}
+    for s in 'gg', 'gq', 'qg', 'qq':
+        points = [(d.m + mres, d.fourquark_Zs[s], d.fourquark_sigmaJK[s]) 
+                  for d in Dat]
+        result.fourquark_Zs[s], result.fourquark_sigmaJK[s] = line_fit(points)
     
-    # (g, q) - scheme
-    points = [(d.m + mres, d.fourquark_Zs_q, d.fourquark_sigmaJK_q)
-              for d in Dat]
-    result.fourquark_Zs_q, result.fourquark_sigmaJK_q = line_fit(points)
-
-    # (q, g) - scheme
-    points = [(d.m + mres, d.fourquark_Zs_qg, d.fourquark_sigmaJK_qg)
-              for d in Dat]
-    result.fourquark_Zs_qg, result.fourquark_sigmaJK_qg = line_fit(points)
-
-    # (q, q) - scheme
-    points = [(d.m + mres, d.fourquark_Zs_qq, d.fourquark_sigmaJK_qq)
-              for d in Dat]
-    result.fourquark_Zs_qq, result.fourquark_sigmaJK_qq = line_fit(points)
-
     return result
 
 def line_fit(data):
