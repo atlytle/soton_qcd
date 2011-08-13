@@ -87,12 +87,11 @@ ss_sigma_dict = {'gg': 'step_scale_sigma', 'gq': 'step_scale_sigma_q',
 def interpolation(data, scheme, O, P):
     '''Interpolating function for step-scaling data.'''
 
-    step_scale = lambda d: getattr(d, ss_dict[scheme])
-    step_scale_sigma = lambda d: getattr(d, ss_sigma_dict[scheme])
+    assert scheme in 'gg', 'gq', 'qg', 'qq'
 
     x = [d.mu for d in data]
-    y = [step_scale(d)[O][P] for d in data]
-    s = [step_scale_sigma(d)[O][P] for d in data]
+    y = [d.step_scale[scheme][O][P] for d in data]
+    s = [d.step_scale_sigma[scheme][O][P] for d in data]
     x_ = np.linspace(data[0].mu, data[-1].mu)
     y_ = interp1d(x, y, kind='cubic')  # (x_)
     s_ = interp1d(x, s, kind='linear')  # (x_)
