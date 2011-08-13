@@ -196,21 +196,21 @@ def fourquark_Zs(Data):
 				                   Data.outprop_list,
                                    Data.fourquark_array)
     norm = (Data.V)**3
-
+    Data.fourquark_Zs = dict(gg=None, gq=None, qg=None, qq=None)
     # (g, Y) - schemes, deltaS = 2 basis
     Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm
     VpA = Data.Lambda_VpA  # Requires prior bilinear calculation.
     Vq = Data.Vq  # Requires prior bilinear calculation.
     Z_tmp = dot(F_gg, inv(Data.fourquark_Lambda))
-    Data.fourquark_Zs = Z_tmp*(VpA)*(VpA)  # (g, g)
-    Data.fourquark_Zs_q = Z_tmp*(Vq)*(Vq)  # (g, q)
+    Data.fourquark_Zs['gg'] = Z_tmp*(VpA)*(VpA)  # (g, g)
+    Data.fourquark_Zs['gq'] = Z_tmp*(Vq)*(Vq)  # (g, q)
     
     # (q, Y) - schemes, deltaS = 2 basis
     aq, apSq = Data.aq, Data.apSq
     Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*norm
     Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
-    Data.fourquark_Zs_qg = Z_tmp*(VpA)*(VpA)  # (q, g)
-    Data.fourquark_Zs_qq = Z_tmp*(Vq)*(Vq)    # (q, q)
+    Data.fourquark_Zs['qg'] = Z_tmp*(VpA)*(VpA)  # (q, g)
+    Data.fourquark_Zs['qq'] = Z_tmp*(Vq)*(Vq)    # (q, q)
 
 def fourquark_ZsJK(Data):
     amputatedJK = map(amputate_fourquark, JKsample(Data.inprop_list),
@@ -228,26 +228,24 @@ def fourquark_ZsJK(Data):
     Data.Lambda_sigmaJK_q = JKsigma(Data.Lambda_JK_q, Data.fourquark_Lambda_q)
 
     # Zs.
+    Data.fourquark_ZsJK = dict(gg=None, gq=None, qg=None, qq=None)
+    Data.fourquark_sigmaJK = dict(gg=None, gq=None, qg=None, qq=None)
     # (g, g)
     Zs = lambda Lambda, VpA: dot(F_gg, inv(Lambda))*VpA*VpA
-    Data.fourquark_ZsJK = map(Zs, Data.Lambda_JK, Data.Lambda_VpA_JK)
-    Data.fourquark_sigmaJK = JKsigma(Data.fourquark_ZsJK,
-                                     Data.fourquark_Zs)
+    Data.fourquark_ZsJK['gg'] = map(Zs, Data.Lambda_JK, Data.Lambda_VpA_JK)
     # (g, q) 
     Zs = lambda Lambda, Vq: dot(F_gg, inv(Lambda))*Vq*Vq
-    Data.fourquark_ZsJK_q = map(Zs, Data.Lambda_JK, Data.Vq_JK)
-    Data.fourquark_sigmaJK_q = JKsigma(Data.fourquark_ZsJK_q,
-                                       Data.fourquark_Zs_q)
+    Data.fourquark_ZsJK['gq'] = map(Zs, Data.Lambda_JK, Data.Vq_JK)
     # (q, g)
     Zs = lambda Lambda, VpA: dot(F_qq, inv(Lambda))*VpA*VpA
-    Data.fourquark_ZsJK_qg = map(Zs, Data.Lambda_JK_q, Data.Lambda_VpA_JK)
-    Data.fourquark_sigmaJK_qg = JKsigma(Data.fourquark_ZsJK_qg,
-                                     Data.fourquark_Zs_qg)
+    Data.fourquark_ZsJK['qg'] = map(Zs, Data.Lambda_JK_q, Data.Lambda_VpA_JK)
     # (q, q) 
     Zs = lambda Lambda, Vq: dot(F_qq, inv(Lambda))*Vq*Vq
-    Data.fourquark_ZsJK_qq = map(Zs, Data.Lambda_JK_q, Data.Vq_JK)
-    Data.fourquark_sigmaJK_qq = JKsigma(Data.fourquark_ZsJK_qq,
-                                       Data.fourquark_Zs_qq)
+    Data.fourquark_ZsJK['qq'] = map(Zs, Data.Lambda_JK_q, Data.Vq_JK)
+
+    for scheme in 'gg', 'gq', 'qg', 'qq':
+        Data.fourquark_sigmaJK[scheme] = JKsigma(Data.fourquark_ZsJK[scheme],
+                                                 Data.fourquark_Zs[scheme])
     
 
 def fourquark_ZsBoot(Data):
