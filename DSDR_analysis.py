@@ -39,9 +39,9 @@ def calc_Zs(Data):
 
 def main():
     
-    compute = True
-    dump = True
-    load = False
+    compute = False
+    dump = False
+    load = True
 
     if compute:
         # Load data.
@@ -79,11 +79,11 @@ def main():
 
     if load:
         with open(DSDR_0042, 'r') as f:
-            pickle.load(data0042, f)
+            data0042 = pickle.load(f)
         with open(DSDR_001, 'r') as f:
-            pickle.load(data001, f)
+            data001 = pickle.load(f)
         with open(DSDR_chiral, 'r') as f:
-            pickle.load(data0, f)
+            data0 = pickle.load(f)
     
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
