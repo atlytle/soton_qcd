@@ -68,69 +68,29 @@ def main():
     Z_DSDR =  DSDR_chiral[2]
     IWc_chiral = IWc_chiral_15
     IWf_chiral = IWf_chiral_15
-
-    print '____(g, g) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'gg', -2)
-    C = C_178(alpha_s3, 'gg')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(g, q) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_q[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_q[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'gq', -2)
-    C = C_178(alpha_s3, 'gq')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(q, g) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_qg[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_qg[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'qg', -2)
-    C = C_178(alpha_s3, 'qg')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(q, q) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_qq[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_qq[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'qq', -2)
-    C = C_178(alpha_s3, 'qq')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
     
+    for scheme in 'gg', 'gq', 'qg', 'qq':
+        print '____({0}, {1}) - scheme____\n'.format(*scheme)
+        Z = new(Z_DSDR.fourquark_Zs[scheme][:3,:3])
+        dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
+        ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
+        C = C_178(alpha_s3, scheme)
+        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
+
     ####
 
     print 'Matching points 1.1 GeV, 3 GeV\n'
     Z_DSDR =  DSDR_chiral[0] 
     IWc_chiral = IWc_chiral_11
     IWf_chiral = IWf_chiral_11
-
-    print '____(g, g) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'gg', -2)
-    C = C_178(alpha_s3, 'gg')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(g, q) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_q[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_q[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'gq', -2)
-    C = C_178(alpha_s3, 'gq')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(q, g) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_qg[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_qg[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'qg', -2)
-    C = C_178(alpha_s3, 'qg')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
-
-    print '____(q, q) - scheme____\n'
-    Z = new(Z_DSDR.fourquark_Zs_qq[:3,:3])
-    dZ = new2(Z_DSDR.fourquark_sigmaJK_qq[:3,:3])
-    ss = continuum_matrix(IWc_chiral, IWf_chiral, 'qq', -2)
-    C = C_178(alpha_s3, 'qq')
-    print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
+    
+    for scheme in 'gg', 'gq', 'qg', 'qq':
+        print '____({0}, {1}) - scheme____\n'.format(*scheme)
+        Z = new(Z_DSDR.fourquark_Zs[scheme][:3,:3])
+        dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
+        ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
+        C = C_178(alpha_s3, scheme)
+        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
 
 
     return 0
