@@ -141,7 +141,7 @@ def plot_data(data_, scheme, O, P, save=False):
     id=0
     p.figure()
     title = {'gg': '\gamma^{\mu}, \gamma^{\mu}', 'gq': '\gamma^{\mu}, q',
-            'qg': 'q, \gamma^{\mu}', 'qq': 'q, q'}
+             'qg': 'q, \gamma^{\mu}', 'qq': 'q, q'}
     p.title('$({0}) - \mathrm{{scheme}}$'.format(title[scheme]))
     p.xlabel('$\mu \, (\mathrm{GeV})$', fontsize=16)
     label = str(O+1) + str(P+1)

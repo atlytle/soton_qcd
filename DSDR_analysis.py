@@ -1,6 +1,7 @@
 import sys
 import pickle
 import numpy as np
+import pylab as p
 from multiprocessing import Pool
 
 import domain_wall as dw
@@ -37,11 +38,47 @@ def calc_Zs(Data):
     Data.clear()
     return Data
 
+def extract_data(data, scheme, O, P):
+    '''Extract Zs for plotting.'''
+    x = [d.apSq for d in data]
+    y = [d.fourquark_Zs[scheme][O][P] for d in data]
+    s = [d.fourquark_sigmaJK[scheme][O][P] for d in data]
+    return (x, y, s)
+def plot_data(data_, scheme, O, P, save=False):
+    '''Plot Zs vs (ap)^2 at finite am and in chiral limit.'''
+    
+    mark = ['o', 'o', 'o-']
+    id=0
+    title = {'gg': '\gamma^{\mu}, \gamma^{\mu}', 'gq': '\gamma^{\mu}, q',
+             'qg': 'q, \gamma^{\mu}', 'qq': 'q, q'}
+    label = str(O+1) + str(P+1)
+    legend = ()
+
+    p.figure()
+    p.title('$({0}) - \mathrm{{scheme}}$'.format(title[scheme]))
+    p.xlabel('$(ap)^{2}$')
+    p.ylabel('$Z_{0}$'.format('{'+label+'}'), fontsize=16)
+    
+    for data in data_:
+        x, y, s = extract_data(data, scheme, O, P)
+        dada = p.errorbar(x, y, yerr=s, fmt=mark[id])
+        legend += dada[0],
+        id += 1
+    p.legend(legend, ('$am=.0042$', '$am=.001$', '$am=-m_{res}$'), 'best')
+    if save:
+        root = '/Users/atlytle/Dropbox/TeX_docs/soton'\
+               '/AuXDet_NPR/fourFermi/plots'
+        p.savefig(root + '/Z_{0}_{1}.pdf'.format(scheme, label))
+    else:
+        p.show()
+
 def main():
     
     compute = False
     dump = False
     load = True
+    plot = True
+    save = False
 
     if compute:
         # Load data.
@@ -84,6 +121,8 @@ def main():
             data001 = pickle.load(f)
         with open(DSDR_chiral, 'r') as f:
             data0 = pickle.load(f)
+
+    plot_data([data0042, data001, data0], 'gg', 2, 1)
     
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
