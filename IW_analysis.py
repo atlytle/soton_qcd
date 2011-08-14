@@ -87,7 +87,7 @@ ss_sigma_dict = {'gg': 'step_scale_sigma', 'gq': 'step_scale_sigma_q',
 def interpolation(data, scheme, O, P):
     '''Interpolating function for step-scaling data.'''
 
-    assert scheme in 'gg', 'gq', 'qg', 'qq'
+    assert scheme in ['gg', 'gq', 'qg', 'qq']
 
     x = [d.mu for d in data]
     y = [d.step_scale[scheme][O][P] for d in data]
@@ -221,16 +221,16 @@ def main():
 
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
-        map(do_ss(data0c[0]), data0c)
-        map(do_ssJK(data0c[0]), data0c)
+        map(do_ss(data0c[1]), data0c)
+        map(do_ssJK(data0c[1]), data0c)
         
-        map(do_ss(data0f[0]), data0f)
-        map(do_ssJK(data0f[0]), data0f)
+        map(do_ss(data0f[1]), data0f)
+        map(do_ssJK(data0f[1]), data0f)
     
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
-    kosher_f = pickle_root + '/IWf_chiral_pickle_11'
-    kosher_c = pickle_root + '/IWc_chiral_pickle_11'
+    kosher_f = pickle_root + '/IWf_chiral_pickle_15'
+    kosher_c = pickle_root + '/IWc_chiral_pickle_15'
 
     if compute and dump:
         with open(kosher_f, 'w') as f:
