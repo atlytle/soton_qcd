@@ -64,15 +64,26 @@ def main():
         data0 = map(fits.line_fit_2ptData, data001, data0042)
 
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
-    kosher = pickle_root + '/DSDR_chiral_pickle'
+    DSDR_0042 = pickle_root + '/DSDR_0042_pickle'
+    DSDR_001 = pickle_root + '/DSDR_001_pickle'
+    DSDR_chiral = pickle_root + '/DSDR_chiral_pickle'
 
     if dump:
-        with open(kosher, 'w') as f:
+        with open(DSDR_0042, 'w') as f:
+            pickle.dump(data0042, f)
+        with open(DSDR_001, 'w') as f:
+            pickle.dump(data001, f)
+        with open(DSDR_chiral, 'w') as f:
             pickle.dump(data0, f)
 
+
     if load:
-        with open(kosher, 'r') as f:
-            data0 = pickle.load(f)
+        with open(DSDR_0042, 'r') as f:
+            pickle.load(data0042, f)
+        with open(DSDR_001, 'r') as f:
+            pickle.load(data001, f)
+        with open(DSDR_chiral, 'r') as f:
+            pickle.load(data0, f)
     
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
