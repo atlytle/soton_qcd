@@ -98,7 +98,7 @@ def mixArray(g):
     return r
 
 def qqMixArray(aq, pseudo=False):
-    "Color-mixed qslash projectors."
+    "Color-mixed qslash x qslash projectors."
     # optimize!
     q = slash_nc(aq)
     if pseudo:
@@ -117,6 +117,26 @@ def qqMixArray(aq, pseudo=False):
     for i, j, k, l in product(range(12), repeat=4):
         r[i][j][k][l] = qqMixProj(i, j, k, l)
     return r
+
+def sigmaMixArray(aq):
+    "Color-mixed sigma.q x sigma.q projectors."
+    sdq = sigma_dot_q(aq, color=False)
+    kd = np.identity(3)
+
+    def sigmaMixProj(ii, jj, kk, ll):
+        #global q, kd
+        i, a = switch(ii)
+        j, b = switch(jj)
+        k, c = switch(kk)
+        l, d = switch(ll)
+        sdq_dot_sdq=sum([sdq[mu][j][i]*sdq[mu][l][k] for mu in range(4)])
+        return (sdq_dot_sdq)*kd[d][a]*kd[b][c]
+
+    r = np.zeros((12, 12, 12, 12), complex) # !
+    for i, j, k, l in product(range(12), repeat=4):
+        r[i][j][k][l] = qqMixProj(i, j, k, l)
+    return r
+
 
 # Momentum definitions.
 def sgn0(x):
@@ -148,15 +168,19 @@ def slash_nc(p):
     g = (G[1], G[2], G[4], G[8])
     return sum(g[mu]*p[mu] for mu in range(4))
 
-def sigma(mu, nu):
+def sigma(mu, nu, color=False):
+    "sigma^{mu nu} in spin(-color) basis."
     g = (G[1], G[2], G[4], G[8])
-    return (1/4.)*(np.dot(g[mu], g[nu]) - np.dot(g[nu], g[mu]))
+    if color:
+        g = (Gc[1], Gc[2], Gc[4], Gc[8])
+
+    return (1/2.)*(np.dot(g[mu], g[nu]) - np.dot(g[nu], g[mu]))
     
-def sigma_dot_q(aq):
-    "Four-list sigma_{mu nu} q^nu in spin basis."
+def sigma_dot_q(aq, color=False):
+    "Four-list sigma^{mu nu} q_{nu} in spin(-color) basis."
     sdq = [0, 0, 0, 0]
     for mu in range(4):
-        sdq[mu] = sum([sigma(mu, nu)*aq[nu] for nu in range(4)])
+        sdq[mu] = sum([sigma(mu, nu, color)*aq[nu] for nu in range(4)])
     return sdq
 
 def aq(ap1, ap2):

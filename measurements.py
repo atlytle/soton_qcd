@@ -138,6 +138,8 @@ def proj_g(amputated, gspec):
         result.append(tensordot(Gc[g], tmp, ([0,1], [1,0])))
     return sum(result)
 
+# consolidate proj_q, proj_q5 w/ pseudo tag; q, qmix w/ color tag; g, q w/ ...
+# split off a different file called projectors...
 def proj_q(amputated, aq):
     "Contract amputated fourquark correlator w/ qslash x qslash projector."
     qslash = dw.slash(aq)
@@ -158,6 +160,20 @@ def proj_qmix(amputated, aq):
 def proj_q5mix(amputated, aq):
     proj = dw.qqMixArray(aq, True)
     #return tensordot(proj, amputated, ([1,0,3,2], [0,1,2,3]))
+    return np.sum(proj*amputated)
+
+def proj_sigma(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q x sigma.q projector."
+    result = np.zeros(12, 12, 12, 12)
+    sdq = sigma_dot_q(aq, color=True)
+    for mu in range(4):
+        tmp = tensordot(sdq, amputated, ([0,1], [1,0]))
+        result += tensordot(sdq, tmp, ([0,1], [1,0]))
+    return result
+
+def proj_sigma_mix(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q x sigma.q mixed."
+    proj = dw.sigmaMixArray(aq)
     return np.sum(proj*amputated)
 
 def fourquark_proj_g(amputated):
