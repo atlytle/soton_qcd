@@ -77,26 +77,24 @@ def switch(i):
     "Switch between spin-color basis and tensor basis."
     return (i%4, i/4)
 
+#can mixArray and qqMixArray be integrated?
 def mixArray(g):
     "Color-mixed gamma projectors."
 
-    def mixProj(g, i, j, k, l, a, b, c, d):
-        "Tensor definition of color-mixed projectors."
-        GG = G[g]
-        kd = np.identity(3)
-        return GG[i][j]*GG[k][l]*kd[a][d]*kd[b][c]
+    GG = G[g]
+    kd = np.identity(3)
 
-    def newMixProj(g, ii, jj, kk, ll):
+    def newMixProj(ii, jj, kk, ll):
         "Spin-color basis color-mixed projectors."
         i, a = switch(ii)
         j, b = switch(jj)
         k, c = switch(kk)
         l, d = switch(ll)
-        return mixProj(g, i, j, k, l, a, b, c, d)
+        return GG[i][j]*GG[k][l]*kd[a][d]*kd[b][c] #ij -> ji?
 
     r = np.zeros((12, 12, 12, 12), complex) # !
     for i, j, k, l in product(range(12), repeat=4):
-        r[i][j][k][l] = newMixProj(g, i, j, k, l)
+        r[i][j][k][l] = newMixProj(i, j, k, l)
     return r
 
 def qqMixArray(aq, pseudo=False):
@@ -106,13 +104,6 @@ def qqMixArray(aq, pseudo=False):
     if pseudo:
         q = np.dot(q, G[15])
     kd = np.identity(3)
-    '''def qqMix(aq, i, j, k, l, a, b, c, d, pseudo=False):
-        if pseudo:
-            q = np.dot(slash_nc(aq), G[15])
-        else:
-            q = slash_nc(aq)
-        kd = np.identity(3)
-        return q[j][i]*q[l][k]*kd[d][a]*kd[b][c]'''
 
     def qqMixProj(ii, jj, kk, ll):
         #global q, kd
