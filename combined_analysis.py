@@ -32,18 +32,26 @@ def propagate_scalar(A, dA, Z, dZ):
     "Propagate scalar*matrix (scalar) uncertainty."
     return (A*Z, np.sqrt((A*dZ)**2 + (dA*Z)**2))
 
-def new(Zs):
-    # Delta S = 2 --> Delta S = 1.
+def new(Zs, full=False):
+    "Delta S = 2 --> Delta S = 1."
     convert = np.array([[1, 0, 0],
                         [0, 1, -0.5],
                         [0, -2, 1]])
+    if full:
+        convert = np.array([[1, 1, -0.5],
+                            [1, 1, -0.5],
+                            [-2, -2, 1]])
     return convert*Zs[:3,:3]
  
-def new2(Zs):
-    # Scale error bars.
+def new2(Zs, full=False):
+    "Scale error bars, Delta S = 2 --> Delta S = 1."
     convert = np.array([[1, 0, 0],
                         [0, 1, 0.5],
                         [0, 2, 1]])
+    if full:
+        convert = np.array([[1, 1, 0.5],
+                            [1, 1, 0.5],
+                            [2, 2, 1]])
     return convert*Zs[:3,:3]
 
 def print_results(C, ss, dss, Z, dZ, ZA, dZA):
@@ -82,11 +90,11 @@ def main():
     
     for scheme in 'gg', 'gq', 'qg', 'qq':
         print '____({0}, {1}) - scheme____\n'.format(*scheme)
-        Z = new(Z_DSDR.fourquark_Zs[scheme][:3,:3])
-        dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
+        Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
+        dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
         C = C_178(alpha_s3, scheme)
-        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ, ZA, dZA)
+        print_results(C, new(ss[0]), new2(ss[1]), new(Z), new2(dZ), ZA, dZA)
 
     ####
 
@@ -97,12 +105,11 @@ def main():
     
     for scheme in 'gg', 'gq', 'qg', 'qq':
         print '____({0}, {1}) - scheme____\n'.format(*scheme)
-        Z = new(Z_DSDR.fourquark_Zs[scheme][:3,:3])
-        dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
+        Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
+        dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
         C = C_178(alpha_s3, scheme)
-        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ, ZA, dZA)
-
+        print_results(C, new(ss[0]), new2(ss[1]), new(Z), new2(dZ), ZA, dZA)
 
     return 0
 
