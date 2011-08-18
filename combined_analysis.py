@@ -10,6 +10,8 @@ IWc_chiral_15 = pickle_root + '/IWc_chiral_pickle_15'
 IWf_chiral_11 = pickle_root + '/IWf_chiral_pickle_11'
 IWc_chiral_11 = pickle_root + '/IWc_chiral_pickle_11'
 
+ZA = 0.68816
+dZA = 0.00070
 
 np.set_printoptions(precision=4)
 
@@ -26,6 +28,10 @@ def propagate_errors(Zs, dZs):
 
     return (reduce(np.dot, Zs), np.sqrt(sigma_sq))
 
+def propagate_scalar(A, dA, Z, dZ):
+    "Propagate scalar*matrix (scalar) uncertainty."
+    return (A*Z, np.sqrt((A*dZ)**2 + (dA*Z)**2))
+
 def new(Zs):
     # Delta S = 2 --> Delta S = 1.
     convert = np.array([[1, 0, 0],
@@ -40,7 +46,11 @@ def new2(Zs):
                         [0, 2, 1]])
     return convert*Zs[:3,:3]
 
-def print_results(C, ss, dss, Z, dZ):
+def print_results(C, ss, dss, Z, dZ, ZA, dZA):
+    print 'Z_A: {0} +/- {1}\n'.format(ZA, dZA)
+    print 'Z_DSDR/(Z_A)^2:\n{0}\n+/-\n{1}\n'.format(Z, dZ)
+    ZA2, dZA2 = propagate_scalar(ZA, dZA, ZA, dZA)
+    Z, dZ = propagate_scalar(ZA2, dZA2, Z, dZ)
     print 'Z_DSDR:\n{0}\n+/-\n{1}\n'.format(Z, dZ)
     print 'sigma:\n{0}\n+/-\n{1}\n'.format(ss, dss)
     print 'C:\n{0}\n'.format(C)
@@ -48,6 +58,7 @@ def print_results(C, ss, dss, Z, dZ):
     sigmas = [np.zeros(3), dss, dZ]
     r, dr = propagate_errors(factors, sigmas)
     print 'Final Result:\n{0}\n+/-\n{1}\n'.format(r, dr)
+
 
 def main():
     global DSDR_chiral
@@ -75,7 +86,7 @@ def main():
         dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
         ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
         C = C_178(alpha_s3, scheme)
-        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
+        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ, ZA, dZA)
 
     ####
 
@@ -90,7 +101,7 @@ def main():
         dZ = new2(Z_DSDR.fourquark_sigmaJK[scheme][:3,:3])
         ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
         C = C_178(alpha_s3, scheme)
-        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ)
+        print_results(C, new(ss[0]), new2(ss[1]), Z, dZ, ZA, dZA)
 
 
     return 0
