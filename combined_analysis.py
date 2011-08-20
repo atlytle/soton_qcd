@@ -13,7 +13,7 @@ IWc_chiral_11 = pickle_root + '/IWc_chiral_pickle_11'
 ZA = 0.68816
 dZA = 0.00070
 
-np.set_printoptions(precision=4)
+np.set_printoptions(precision=3)
 
 def propagate_errors(Zs, dZs):
     "Uncertainty in matrix multiplication."
