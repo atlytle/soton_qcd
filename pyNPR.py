@@ -119,8 +119,8 @@ class DSDR_Data(Data):
 
     L, T = 32., 64.
     V = (L**3)*T
-    a = .733  #(12) 1/GeV
-    mres = .001853
+    a = 1/1.3749  # 1/GeV
+    mres = .0018347
 
     def __init__(self, m, p, tw, gauge_list):
 
@@ -134,7 +134,7 @@ class IWf_Data(Data):
     
     L, T = 32., 64.
     V = (L**3)*T
-    a = 1/2.28  # 1/GeV
+    a = 1/2.282  # 1/GeV
     mres = .0006664
 
     def __init__(self, m, p, tw, gauge_list):
@@ -149,7 +149,7 @@ class IWc_Data(Data):
 
     L, T = 24., 64.
     V = (L**3)*T
-    a = 1/1.73  # 1/GeV
+    a = 1/1.730  # 1/GeV
     mres = .003152
 
     def __init__(self, m, p, tw, gauge_list):
