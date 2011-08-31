@@ -102,7 +102,8 @@ def continuum_extrap(datac, dataf, scheme, O, P):
     '''Continuum extrapolation of step-scaling data.'''
     
     yc_, sc_, xc, yc, sc = interpolation(datac, scheme, O, P)[1:]
-    x_, yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)
+    yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)[1:]
+    x_ = np.linspace(max(xc[0],xf[0]), min(xc[-1],xf[-1]))
 
     ac = datac[0].a
     af = dataf[0].a
@@ -113,8 +114,6 @@ def continuum_extrap(datac, dataf, scheme, O, P):
     results = map(fits.line_fit, pts)
     y = np.array([r[0] for r in results])
     s = np.array([r[1] for r in results])
-    #print 'mu=', x_[-2]
-    #print y[-2], s[-2]
     
     return (x_, y, s)
 
@@ -150,7 +149,6 @@ def plot_data(data_, scheme, O, P, save=False):
 
     for data in data_:
         x_, y_, s_, x, y, s = interpolation(data, scheme, O, P)
-        #dada = p.plot(*interpolation(data, scheme, O, P))
         dada = p.plot(x, y, 'o', x_, y_(x_), '-',
                       x_, y_(x_)+s_(x_), '--', x_, y_(x_)-s_(x_), '--')
         legend += dada[1],
@@ -173,7 +171,7 @@ def main():
     compute = True  # Compute ss-functions from raw data.
     dump = True     # Pickle results.
     load = False    # Un-pickle pre-computed results.
-    plot = True     # Plot results.
+    plot = False     # Plot results.
     save = False    # Save plots.
 
     if compute:
@@ -221,16 +219,16 @@ def main():
 
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
-        map(do_ss(data0c[1]), data0c)
-        map(do_ssJK(data0c[1]), data0c)
+        map(do_ss(data0c[0]), data0c)
+        map(do_ssJK(data0c[0]), data0c)
         
-        map(do_ss(data0f[1]), data0f)
-        map(do_ssJK(data0f[1]), data0f)
+        map(do_ss(data0f[0]), data0f)
+        map(do_ssJK(data0f[0]), data0f)
     
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
-    kosher_f = pickle_root + '/IWf_chiral_pickle_15'
-    kosher_c = pickle_root + '/IWc_chiral_pickle_15'
+    kosher_f = pickle_root + '/IWf_chiral_pickle_11'
+    kosher_c = pickle_root + '/IWc_chiral_pickle_11'
 
     if compute and dump:
         with open(kosher_f, 'w') as f:
@@ -244,7 +242,7 @@ def main():
         with open(kosher_c, 'r') as f:
             data0c = pickle.load(f)
     
-    print continuum_matrix(data0c, data0f, 'gg', -2)
+    #print continuum_matrix(data0c, data0f, 'gg', -2)
 
     #plots
     if plot:
