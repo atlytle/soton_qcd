@@ -98,6 +98,26 @@ def interpolation(data, scheme, O, P):
     
     return (x_, y_, s_, x, y, s)
 
+def interpolate_Zs(dat1, dat2, mu):
+    "Nasty kludge to calculate step-scale denominator."
+    # NOTE this is incorrect since p, tw not defined...
+    result = dat1.__class__(dat1.mres, dat1.p, dat1.tw, None)
+    result.fourquark_Zs = {}
+    result.fourquark_sigmaJK = {}
+    for s in 'gg', 'gq', 'qg', 'qq':
+        # Zs
+        p1 = (dat1.mu, dat1.fourquark_Zs[s])
+        p2 = (dat2.mu, dat2.fourquark_Zs[s])
+        m, b = fits.line_fit_2pt(p1, p2)
+        result.fourquark_Zs[s] = m*mu + b
+        # sigmas
+        p1 = (dat1.mu, dat1.fourquark_sigmaJK[s])
+        p2 = (dat2.mu, dat2.fourquark_sigmaJK[s])
+        m, b = fits.line_fit_2pt(p1, p2)
+        result.fourquark_sigmaJK[s] = m*mu + b
+
+    return result
+
 def continuum_extrap(datac, dataf, scheme, O, P):
     '''Continuum extrapolation of step-scaling data.'''
     
@@ -168,9 +188,9 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def main():
-    compute = False  # Compute ss-functions from raw data.
-    dump = False     # Pickle results.
-    load = True    # Un-pickle pre-computed results.
+    compute = True  # Compute ss-functions from raw data.
+    dump = True     # Pickle results.
+    load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
 
@@ -216,14 +236,17 @@ def main():
         data0f = map(fits.line_fit_Data, data004, data006, data008)
      
         # Step-scaling functions.
-
+        
+        # Should ss functions just be calculated on the fly? Little overhead.
+        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
+        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
-        map(do_ss(data0c[0]), data0c)
-        map(do_ssJK(data0c[0]), data0c)
+        map(do_ss(denomC), data0c)
+        map(do_ssJK(denomC), data0c)
         
-        map(do_ss(data0f[0]), data0f)
-        map(do_ssJK(data0f[0]), data0f)
+        map(do_ss(denomF), data0f)
+        map(do_ssJK(denomF), data0f)
     
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'

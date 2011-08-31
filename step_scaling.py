@@ -36,5 +36,5 @@ def do_ss(denominator):
     return lambda d: step_scale(d, denominator)
 
 def do_ssJK(denominator):
-    "Return a function that calculates sigma_{Z/denominato}."
+    "Return a function that calculates sigma_{Z/denominator}."
     return lambda d: step_scale_sigma(d, denominator)
