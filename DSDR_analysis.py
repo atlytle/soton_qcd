@@ -44,6 +44,7 @@ def extract_data(data, scheme, O, P):
     y = [d.fourquark_Zs[scheme][O][P] for d in data]
     s = [d.fourquark_sigmaJK[scheme][O][P] for d in data]
     return (x, y, s)
+
 def plot_data(data_, scheme, O, P, save=False):
     '''Plot Zs vs (ap)^2 at finite am and in chiral limit.'''
     
