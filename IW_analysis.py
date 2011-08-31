@@ -168,9 +168,9 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def main():
-    compute = True  # Compute ss-functions from raw data.
-    dump = True     # Pickle results.
-    load = False    # Un-pickle pre-computed results.
+    compute = False  # Compute ss-functions from raw data.
+    dump = False     # Pickle results.
+    load = True    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
 
