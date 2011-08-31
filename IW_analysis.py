@@ -101,8 +101,8 @@ def interpolation(data, scheme, O, P):
 def continuum_extrap(datac, dataf, scheme, O, P):
     '''Continuum extrapolation of step-scaling data.'''
     
-    x_, yc_, sc_, xc, yc, sc = interpolation(datac, scheme, O, P)
-    yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)[1:]
+    yc_, sc_, xc, yc, sc = interpolation(datac, scheme, O, P)[1:]
+    x_, yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)
 
     ac = datac[0].a
     af = dataf[0].a
@@ -170,11 +170,11 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def main():
-    compute = True
-    dump = True
-    load = False
-    plot = False
-    save = False
+    compute = True  # Compute ss-functions from raw data.
+    dump = True     # Pickle results.
+    load = False    # Un-pickle pre-computed results.
+    plot = True     # Plot results.
+    save = False    # Save plots.
 
     if compute:
         # Load data.

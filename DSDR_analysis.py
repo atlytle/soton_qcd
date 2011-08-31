@@ -75,11 +75,11 @@ def plot_data(data_, scheme, O, P, save=False):
 
 def main():
     
-    compute = False
-    dump = False
-    load = True
-    plot = True
-    save = False
+    compute = True  # Compute Zs from raw data.
+    dump = True    # Pickle results.
+    load = False    # Un-pickle pre-computed results.
+    plot = False     # Plot results. (not implemented)
+    save = False    # Save plots. (not implemented)
 
     if compute:
         # Load data.
@@ -123,7 +123,8 @@ def main():
         with open(DSDR_chiral, 'r') as f:
             data0 = pickle.load(f)
 
-    plot_data([data0042, data001, data0], 'gg', 2, 1)
+    if plot:
+        plot_data([data0042, data001, data0], 'gg', 2, 1)
     
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'

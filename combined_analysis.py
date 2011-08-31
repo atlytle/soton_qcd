@@ -98,7 +98,7 @@ def main():
 
     ####
 
-    print 'Matching points 1.1 GeV, 3 GeV\n'
+    print 'Matching points 1.145 GeV, 3 GeV\n'
     Z_DSDR =  DSDR_chiral[0] 
     IWc_chiral = IWc_chiral_11
     IWf_chiral = IWf_chiral_11
