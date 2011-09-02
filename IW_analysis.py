@@ -6,6 +6,7 @@ from scipy.interpolate import interp1d
 from multiprocessing import Pool
 
 import fits
+import combined_analysis
 import pyNPR as npr
 import measurements as m
 import domain_wall as dw
@@ -32,12 +33,15 @@ gflist004_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
 gflist006_ = [1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 
               1400, 1450, 1500, 1550, 1600, 1650]
 gflist008_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
-             1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650]
+              1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650]
 
-
-'''plistIW3 = [(-3, 0, 3, 0)]
-twlistIW3 = [.135]
-gflistIW3 = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250]'''
+plist3IWf = [(-5,0,5,0)]
+twlist3IWf = [-0.531292]
+gflist004_3 = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250]
+gflist006_3 = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+               1300, 1350]
+gflist008_3 = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+               1300]
 
 # 24^3 x 64
 plistIWc = [(-3,0,3,0)]*14 + [(-4,0,4,0)]
@@ -61,6 +65,12 @@ twlistIWc_ = [-0.45136, 0.732]
 gflist005_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250]
 gflist01_ = [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300]
 gflist02_ = [700, 750, 800, 850, 900, 950, 1000, 1050]
+
+plist3IWc = [(-5,0,5,0)]
+twlist3IWc = [-0.632547]
+gflist005_3 = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250]
+gflist01_3 = [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200]
+gflist02_3 = [700, 750, 800, 850, 900, 950, 1000, 1050]
 
 def load_IWf_Data(m, plist, twlist, gflist):
     return [npr.IWf_Data(m, plist[i], twlist[i], gflist)
@@ -124,7 +134,7 @@ def continuum_extrap(datac, dataf, scheme, O, P):
     yc_, sc_, xc, yc, sc = interpolation(datac, scheme, O, P)[1:]
     yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)[1:]
     x_ = np.linspace(max(xc[0],xf[0]), min(xc[-1],xf[-1]))
-
+    #print x_
     ac = datac[0].a
     af = dataf[0].a
 
@@ -141,6 +151,9 @@ def continuum_matrix(datac, dataf, scheme, x):
     '''Continuum step-scaling matrix at position x.'''
     ymu = lambda O, P: continuum_extrap(datac, dataf, scheme, O, P)[1][x]
     smu = lambda O, P: continuum_extrap(datac, dataf, scheme, O, P)[2][x]
+
+    x_ = continuum_extrap(datac, dataf, scheme, 0, 0)[0]
+    print "x value: {0}".format(x_[x])
 
     y = np.array([[ymu(0,0), ymu(0,1), ymu(0,2)],
                   [ymu(1,0), ymu(1,1), ymu(1,2)],
@@ -187,33 +200,67 @@ def plot_data(data_, scheme, O, P, save=False):
     else:
         p.show()
 
+def print_results(data):
+    for scheme in 'gg', 'qq':
+        print "____{0}-scheme____".format(scheme)
+        for d in data:
+            print "am={0}, mu={1}".format(d.m, d.mu)
+            print combined_analysis.new(d.fourquark_Zs[scheme])
+            print ''
+
 def main():
-    compute = True  # Compute ss-functions from raw data.
-    dump = True     # Pickle results.
-    load = False    # Un-pickle pre-computed results.
+    compute = False  # Compute ss-functions from raw data.
+    dump = False     # Pickle results.
+    load = True    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
-
+    
     if compute:
-        # Load data.
+        print "Initializing data structures...",
+        # Fine IW.
         data004 = load_IWf_Data(.004, plistIWf_, twlistIWf_, gflist004_) +\
                   load_IWf_Data(.004, plistIWf, twlistIWf, gflist004)
+        tmp = load_IWf_Data(.004, plist3IWf, twlist3IWf,gflist004_3)[0]
+        data004.insert(-1, tmp)
+        del data004[-3]
 
         data006 = load_IWf_Data(.006, plistIWf_, twlistIWf_, gflist006_) +\
                   load_IWf_Data(.006, plistIWf, twlistIWf, gflist006)
+        tmp = load_IWf_Data(.006, plist3IWf, twlist3IWf,gflist006_3)[0]
+        data006.insert(-1, tmp)
+        del data006[-3]
+
 
         data008 = load_IWf_Data(.008, plistIWf_, twlistIWf_, gflist008_) +\
                   load_IWf_Data(.008, plistIWf, twlistIWf, gflist008)
+        tmp = load_IWf_Data(.008, plist3IWf, twlist3IWf,gflist008_3)[0]
+        data008.insert(-1, tmp)
+        del data008[-3]
+        print [d.mu for d in data008]
 
+        # Coarse IW.
         data005 = load_IWc_Data(.005, plistIWc_, twlistIWc_, gflist005_) +\
                   load_IWc_Data(.005, plistIWc, twlistIWc, gflist005)
+        tmp = load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)[0]
+        data005.insert(-1, tmp)
+        del data005[-1]
+
         data01 = load_IWc_Data(.01, plistIWc_, twlistIWc_, gflist01_) +\
                  load_IWc_Data(.01, plistIWc, twlistIWc, gflist01)
+        tmp = load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)[0]
+        data01.insert(-1, tmp)
+        del data01[-1]
+
         data02 = load_IWc_Data(.02, plistIWc_, twlistIWc_, gflist02_) +\
                  load_IWc_Data(.02, plistIWc, twlistIWc, gflist02)
-        #data03 = load_IWc_Data(.03, plistIWc, twlistIWc, gflist03)
-
-                 
+        tmp = load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)[0]
+        data02.insert(-1, tmp)
+        del data02[-1]
+        print [d.mu for d in data02] 
+        del tmp
+        print "complete"
+        
+        print "Computing Zs...",
         # Compute results.
         pool = Pool()
         
@@ -230,6 +277,7 @@ def main():
 
         pool.close()
         pool.join()
+        print "complete"
 
         # Chiral Limits.
         data0c = map(fits.line_fit_Data, data005, data01, data02)
@@ -247,34 +295,56 @@ def main():
         
         map(do_ss(denomF), data0f)
         map(do_ssJK(denomF), data0f)
-    
+        
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
     kosher_f = pickle_root + '/IWf_chiral_pickle_11'
     kosher_c = pickle_root + '/IWc_chiral_pickle_11'
 
+    kosher_f004 = pickle_root + '/IWf_004_pickle_11'
+    kosher_c005 = pickle_root + '/IWc_005_pickle_11'
+    
     if compute and dump:
+        print "Pickling data...",
         with open(kosher_f, 'w') as f:
             pickle.dump(data0f, f)
         with open(kosher_c, 'w') as f:
             pickle.dump(data0c, f)
 
+        with open(kosher_f004, 'w') as f:
+            pickle.dump(data004, f)
+        with open(kosher_c005, 'w') as f:
+            pickle.dump(data005, f)
+
+        print "complete"
+
     if load:
+        print "Un-pickling data...",
         with open(kosher_f, 'r') as f:
             data0f = pickle.load(f)
         with open(kosher_c, 'r') as f:
             data0c = pickle.load(f)
-    
+
+        with open(kosher_f004, 'r') as f:
+            data004 = pickle.load(f)
+        with open(kosher_c005, 'r') as f:
+            data005 = pickle.load(f)
+        print "complete."
     #print continuum_matrix(data0c, data0f, 'gg', -2)
+    print_results([data004[-2], data0f[-2]])
+    print_results([data005[-1], data0c[-1]])
 
     #plots
     if plot:
-        plot_data([data0c, data0f], 'qg', 0, 0, save)
-        plot_data([data0c, data0f], 'qg', 1, 1, save)
-        plot_data([data0c, data0f], 'qg', 2, 2, save)
-        plot_data([data0c, data0f], 'qg', 1, 2, save)
-        plot_data([data0c, data0f], 'qg', 2, 1, save)
+        print "Plotting results...",
+        plot_data([data0c, data0f], 'gg', 0, 0, save)
+        plot_data([data0c, data0f], 'gg', 1, 1, save)
+        plot_data([data0c, data0f], 'gg', 2, 2, save)
+        plot_data([data0c, data0f], 'gg', 1, 2, save)
+        plot_data([data0c, data0f], 'gg', 2, 1, save)
+        print "complete"
 
+    print "IW_analysis complete."
     return 0
 
 if __name__ == "__main__":

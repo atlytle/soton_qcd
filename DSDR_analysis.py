@@ -10,7 +10,9 @@ import measurements as m
 import output as out
 import step_scaling as ss
 import fits
+from combined_analysis import new, new2
 
+np.set_printoptions(precision=10)
 # Parameters.
 plist0042 = [(-3, 0, 3, 0), (-4, 0, 4, 0), (-4, 0, 4, 0), (-4, 0, 4, 0),
              (-4, 0, 4, 0), (-5, 0, 5, 0), (-5, 0, 5, 0), (-5, 0, 5, 0), 
@@ -21,9 +23,13 @@ gflist0042 = [704, 864, 1024, 1184, 1344, 1504, 1664, 1824]
 plist001 = plist0042
 twlist001 = twlist0042
 gflist001 = [500, 564, 628, 692, 756, 820, 884, 948]
-gflist001_ = [500, 516, 532, 564, 580, 596, 628, 644,
-              660, 692, 708, 724, 756, 772, 788, 820,
-              836, 852, 884, 916, 948, 980, 1012]
+gflist001_a = [500, 516, 532, 564, 580, 596, 628, 644,
+               660, 692, 708, 724, 756, 772, 788, 820,
+               836, 852, 884, 916, 948, 980, 1012]
+gflist001_b = [500, 516, 524, 532, 564, 580, 588, 596, 
+               628, 644, 652, 660, 692, 708, 716, 724,
+               756, 772, 788, 820, 836, 844, 852, 884, 
+               900, 908, 916, 948, 964, 980, 1012]
 
 def load_DSDR_Data(m, plist, twlist, gflist):
     return [npr.DSDR_Data(m, plist[i], twlist[i], gflist)
@@ -73,6 +79,30 @@ def plot_data(data_, scheme, O, P, save=False):
     else:
         p.show()
 
+def print_results(data):
+    for scheme in 'gg', 'qq':
+        print "____{0}-scheme____".format(scheme)
+        for d in data:
+            print "am={0}, mu={1}".format(d.m, d.mu)
+           # print "Lambda (g,g):"
+           # x = np.dot(d.fourquark_Lambda, np.linalg.inv(m.F_gg))[:3,:3]
+           # print x
+            #print np.linalg.eigvals(x)
+            #print "Lambda^{-1}:"
+            #y = np.dot(m.F_gg, np.linalg.inv(d.fourquark_Lambda))[:3,:3]
+            #print np.linalg.inv(x)
+            #print y
+            #print "Lambda"
+            #print np.linalg.inv(y)
+            print d.Z_tmp
+            print ''
+            print d.Lambda_VpA
+            print ''
+            print d.fourquark_Zs[scheme]
+            #print new(d.fourquark_Zs[scheme])
+            print ''
+        print ''
+    
 def main():
     
     compute = True  # Compute Zs from raw data.
@@ -85,12 +115,10 @@ def main():
         # Load data.
         data0042 = load_DSDR_Data(.0042, plist0042, twlist0042, gflist0042)
         data001 = \
-            load_DSDR_Data(.001, plist001[0:1], twlist001[0:1], gflist001_) +\
+            load_DSDR_Data(.001, plist001[0:1], twlist001[0:1], gflist001_b) +\
             load_DSDR_Data(.001, plist001[1:2], twlist001[1:2], gflist001) +\
-            load_DSDR_Data(.001, plist001[2:3], twlist001[2:3], gflist001_) +\
+            load_DSDR_Data(.001, plist001[2:3], twlist001[2:3], gflist001_a) +\
             load_DSDR_Data(.001, plist001[3:], twlist001[3:], gflist001)
-
-        #data001 = load_DSDR_Data(.001, plist001, twlist001, gflist001)
 
         # Compute results.
         pool = Pool()
@@ -106,7 +134,7 @@ def main():
     DSDR_001 = pickle_root + '/DSDR_001_pickle'
     DSDR_chiral = pickle_root + '/DSDR_chiral_pickle'
 
-    if dump:
+    if compute and dump:
         with open(DSDR_0042, 'w') as f:
             pickle.dump(data0042, f)
         with open(DSDR_001, 'w') as f:
@@ -126,6 +154,7 @@ def main():
     if plot:
         plot_data([data0042, data001, data0], 'gg', 2, 1)
     
+    print_results([data0042[0], data001[0], data0[0]])
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
     #out.write_Zs(data0042, root + '/Z_am0042_non-exceptional_gamma_new.dat')

@@ -201,14 +201,17 @@ def fourquark_Zs(Data):
     Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm
     VpA = Data.Lambda_VpA  # Requires prior bilinear calculation.
     Vq = Data.Vq  # Requires prior bilinear calculation.
-    Z_tmp = dot(F_gg, inv(Data.fourquark_Lambda))
+    #Z_tmp = dot(F_gg, inv(Data.fourquark_Lambda))
+    Z_tmp = inv(dot(Data.fourquark_Lambda, inv(F_gg)))
+    Data.Z_tmp = Z_tmp
     Data.fourquark_Zs['gg'] = Z_tmp*(VpA)*(VpA)  # (g, g)
     Data.fourquark_Zs['gq'] = Z_tmp*(Vq)*(Vq)  # (g, q)
     
     # (q, Y) - schemes, deltaS = 2 basis
     aq, apSq = Data.aq, Data.apSq
     Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*norm
-    Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
+    #Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
+    Z_tmp = inv(dot(Data.fourquark_Lambda_q, inv(F_qq)))
     Data.fourquark_Zs['qg'] = Z_tmp*(VpA)*(VpA)  # (q, g)
     Data.fourquark_Zs['qq'] = Z_tmp*(Vq)*(Vq)    # (q, q)
 
