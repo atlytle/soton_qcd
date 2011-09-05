@@ -1,7 +1,8 @@
 import pickle, sys
 import numpy as np
+import IW_analysis
 from matching import alpha_s2, alpha_s3, C_178
-from IW_analysis import continuum_matrix
+#from IW_analysis import continuum_matrix
 
 pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
 DSDR_chiral = pickle_root + '/DSDR_chiral_pickle'
@@ -109,7 +110,8 @@ def main():
         print '____({0}, {1}) - scheme____\n'.format(*scheme)
         Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
         dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
-        ss, dss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -1) #was -2
+        ss, dss = IW_analysis.continuum_matrix(IWc_chiral,
+                                               IWf_chiral, scheme, -1) #was -2
         #IWf_result = IWf_chiral[-1].step_scale[scheme][:3,:3]
         #dss_extrap = abs(ss - IWf_result)
         #print dss_extrap

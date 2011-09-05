@@ -26,12 +26,19 @@ gflist006 = [1000, 1040, 1080, 1120, 1160, 1200, 1240, 1280,
 gflist008 = [1800, 1840, 1880, 1920, 1960, 2000, 2040, 2080,
              2120, 2160]
 
-plistIWf_ = [(-2, 0, 2, 0), (-2, 0, 2, 0)]
-twlistIWf_ = [-.413, .783]
-gflist004_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+plistIWf_a = plistIWf_b = [(-2, 0, 2, 0)]
+twlistIWf_a, twlistIWf_b = [-.413], [.783]
+
+gflist004_a = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+              1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650,
+              1700, 1750, 1800, 1850, 1900, 1950]
+gflist004_b = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
               1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650]
-gflist006_ = [1000, 1050, 1100, 1150, 1200, 1250, 1300, 1350, 
-              1400, 1450, 1500, 1550, 1600, 1650]
+gflist006_a = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+               1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650,
+               1700, 1750]
+gflist006_b = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+               1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650]
 gflist008_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
               1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650]
 
@@ -63,7 +70,7 @@ gflist03 = [1140, 1300, 1460, 1620, 1780, 1940, 2100, 2260,
 plistIWc_ = [(-2,0,2,0), (-2,0,2,0)]
 twlistIWc_ = [-0.45136, 0.732]
 gflist005_ = [900, 950, 1000, 1050, 1100, 1150, 1200, 1250]
-gflist01_ = [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300]
+gflist01_ = [1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200] #, 2300]
 gflist02_ = [700, 750, 800, 850, 900, 950, 1000, 1050]
 
 plist3IWc = [(-5,0,5,0)]
@@ -201,63 +208,74 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
-    for scheme in 'gg', 'qq':
+    for scheme in 'gg',:
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
+            try:
+                print "Lambda:"
+                print d.Zinv_q
+                print "Lambda^{-1}:"
+                print d.Z_tmpq
+            except:
+                print "output error"
+            print "Z:"
             print combined_analysis.new(d.fourquark_Zs[scheme])
             print ''
 
 def main():
-    compute = False  # Compute ss-functions from raw data.
+    compute = True  # Compute ss-functions from raw data.
     dump = False     # Pickle results.
-    load = True    # Un-pickle pre-computed results.
+    load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
     
     if compute:
         print "Initializing data structures...",
         # Fine IW.
-        data004 = load_IWf_Data(.004, plistIWf_, twlistIWf_, gflist004_) +\
-                  load_IWf_Data(.004, plistIWf, twlistIWf, gflist004)
-        tmp = load_IWf_Data(.004, plist3IWf, twlist3IWf,gflist004_3)[0]
-        data004.insert(-1, tmp)
-        del data004[-3]
+        data004 = load_IWf_Data(.004, plistIWf_a, twlistIWf_a, gflist004_a) +\
+                  load_IWf_Data(.004, plistIWf_b, twlistIWf_b, gflist004_b) +\
+                  load_IWf_Data(.004, plist3IWf, twlist3IWf, gflist004_3)
+        #tmp = load_IWf_Data(.004, plist3IWf, twlist3IWf,gflist004_3)[0]
+        #data004.insert(-1, tmp)
+        #del data004[-3]
 
-        data006 = load_IWf_Data(.006, plistIWf_, twlistIWf_, gflist006_) +\
-                  load_IWf_Data(.006, plistIWf, twlistIWf, gflist006)
-        tmp = load_IWf_Data(.006, plist3IWf, twlist3IWf,gflist006_3)[0]
-        data006.insert(-1, tmp)
-        del data006[-3]
+        data006 = load_IWf_Data(.006, plistIWf_a, twlistIWf_a, gflist006_a) +\
+                  load_IWf_Data(.006, plistIWf_b, twlistIWf_b, gflist006_b) +\
+                  load_IWf_Data(.006, plist3IWf, twlist3IWf, gflist006_3)
+        #tmp = load_IWf_Data(.006, plist3IWf, twlist3IWf,gflist006_3)[0]
+        #data006.insert(-1, tmp)
+        #del data006[-3]
 
 
-        data008 = load_IWf_Data(.008, plistIWf_, twlistIWf_, gflist008_) +\
-                  load_IWf_Data(.008, plistIWf, twlistIWf, gflist008)
-        tmp = load_IWf_Data(.008, plist3IWf, twlist3IWf,gflist008_3)[0]
-        data008.insert(-1, tmp)
-        del data008[-3]
+        data008 = load_IWf_Data(.008, plistIWf_a, twlistIWf_a, gflist008_) +\
+                  load_IWf_Data(.008, plistIWf_b, twlistIWf_b, gflist008_) +\
+                  load_IWf_Data(.008, plist3IWf, twlist3IWf, gflist008_3)
+        #tmp = load_IWf_Data(.008, plist3IWf, twlist3IWf,gflist008_3)[0]
+        #data008.insert(-1, tmp)
+        #del data008[-3]
         print [d.mu for d in data008]
 
         # Coarse IW.
         data005 = load_IWc_Data(.005, plistIWc_, twlistIWc_, gflist005_) +\
-                  load_IWc_Data(.005, plistIWc, twlistIWc, gflist005)
-        tmp = load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)[0]
-        data005.insert(-1, tmp)
-        del data005[-1]
+                  load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)
+        #tmp = load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)[0]
+        #data005.insert(-1, tmp)
+        #del data005[-1]
 
         data01 = load_IWc_Data(.01, plistIWc_, twlistIWc_, gflist01_) +\
-                 load_IWc_Data(.01, plistIWc, twlistIWc, gflist01)
-        tmp = load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)[0]
-        data01.insert(-1, tmp)
-        del data01[-1]
+                 load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)
+        #tmp = load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)[0]
+        #data01.insert(-1, tmp)
+        #del data01[-1]
 
         data02 = load_IWc_Data(.02, plistIWc_, twlistIWc_, gflist02_) +\
-                 load_IWc_Data(.02, plistIWc, twlistIWc, gflist02)
-        tmp = load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)[0]
-        data02.insert(-1, tmp)
-        del data02[-1]
+                 load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)
+        #tmp = load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)[0]
+        #data02.insert(-1, tmp)
+        #del data02[-1]
         print [d.mu for d in data02] 
-        del tmp
+        #del tmp
         print "complete"
         
         print "Computing Zs...",
@@ -331,8 +349,14 @@ def main():
             data005 = pickle.load(f)
         print "complete."
     #print continuum_matrix(data0c, data0f, 'gg', -2)
-    print_results([data004[-2], data0f[-2]])
-    print_results([data005[-1], data0c[-1]])
+    print "Fine:"
+    print_results([data008[0], data006[0], data004[0], data0f[0]])
+    print_results([data008[1], data006[1], data004[1], data0f[1]])
+    print_results([data008[-1], data006[-1], data004[-1], data0f[-1]])
+    print "Coarse:"
+    print_results([data02[0], data01[0], data005[0], data0c[0]])
+    print_results([data02[1], data01[1], data005[1], data0c[1]])
+    print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
 
     #plots
     if plot:

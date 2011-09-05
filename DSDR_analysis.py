@@ -80,26 +80,19 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
-    for scheme in 'gg', 'qq':
+    for scheme in 'gg',:
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
-           # print "Lambda (g,g):"
-           # x = np.dot(d.fourquark_Lambda, np.linalg.inv(m.F_gg))[:3,:3]
-           # print x
-            #print np.linalg.eigvals(x)
-            #print "Lambda^{-1}:"
-            #y = np.dot(m.F_gg, np.linalg.inv(d.fourquark_Lambda))[:3,:3]
-            #print np.linalg.inv(x)
-            #print y
-            #print "Lambda"
-            #print np.linalg.inv(y)
-            print d.Z_tmp
-            print ''
-            print d.Lambda_VpA
-            print ''
-            print d.fourquark_Zs[scheme]
-            #print new(d.fourquark_Zs[scheme])
+            try:
+                print "Lambda:"
+                print d.Zinv
+                print "Lambda^{-1}:"
+                print d.Z_tmp
+            except:
+                print "output error"
+            print "Z:"
+            print new(d.fourquark_Zs[scheme])
             print ''
         print ''
     

@@ -198,22 +198,23 @@ def fourquark_Zs(Data):
     norm = (Data.V)**3
     Data.fourquark_Zs = dict(gg=None, gq=None, qg=None, qq=None)
     # (g, Y) - schemes, deltaS = 2 basis
-    Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm
+    Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm*chiral_mask
     VpA = Data.Lambda_VpA  # Requires prior bilinear calculation.
     Vq = Data.Vq  # Requires prior bilinear calculation.
-    #Z_tmp = dot(F_gg, inv(Data.fourquark_Lambda))
-    Z_tmp = inv(dot(Data.fourquark_Lambda, inv(F_gg)))
-    Data.Z_tmp = Z_tmp
-    Data.fourquark_Zs['gg'] = Z_tmp*(VpA)*(VpA)  # (g, g)
-    Data.fourquark_Zs['gq'] = Z_tmp*(Vq)*(Vq)  # (g, q)
+    Data.Zinv = dot(Data.fourquark_Lambda, inv(F_gg))
+    Data.Z_tmp = inv(Data.Zinv)#*chiral_mask
+    Data.fourquark_Zs['gg'] = Data.Z_tmp*(VpA)*(VpA)  # (g, g)
+    Data.fourquark_Zs['gq'] = Data.Z_tmp*(Vq)*(Vq)  # (g, q)
     
     # (q, Y) - schemes, deltaS = 2 basis
     aq, apSq = Data.aq, Data.apSq
-    Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*norm
+    Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*\
+                                                norm#*chiral_mask[:3,:3]
     #Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
-    Z_tmp = inv(dot(Data.fourquark_Lambda_q, inv(F_qq)))
-    Data.fourquark_Zs['qg'] = Z_tmp*(VpA)*(VpA)  # (q, g)
-    Data.fourquark_Zs['qq'] = Z_tmp*(Vq)*(Vq)    # (q, q)
+    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))*chiral_mask[:3,:3]
+    Data.Z_tmpq = inv(Data.Zinv_q)
+    Data.fourquark_Zs['qg'] = Data.Z_tmpq*(VpA)*(VpA)  # (q, g)
+    Data.fourquark_Zs['qq'] = Data.Z_tmpq*(Vq)*(Vq)    # (q, q)
 
 def fourquark_ZsJK(Data):
     amputatedJK = map(amputate_fourquark, JKsample(Data.inprop_list),
@@ -264,9 +265,16 @@ F_qq = array([[384, 0, 0],
               [0, 288, 96],
               [0, -48, -144]])
 
-chiral_mask = array([[1, 0, 0, 0, 0],
-                     [0, 1, 1, 0, 0],
-                     [0, 1, 1, 0, 0],
-                     [0, 0, 0, 1, 1],
-                     [0, 0, 0, 1, 1]])
- 
+# Decouple the sectors.
+chiral_mask = array([[1., 0, 0, 0, 0],
+                     [0, 1., 1., 0, 0],
+                     [0, 1., 1., 0, 0],
+                     [0, 0, 0, 1., 1.],
+                     [0, 0, 0, 1., 1.]])
+
+three_mask = array([[1., 1., 1., 0, 0],
+                    [1., 1., 1., 0, 0],
+                    [1., 1., 1., 0, 0],
+                    [0, 0, 0, 1., 1.],
+                    [0, 0, 0, 1., 1.]])
+
