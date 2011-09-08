@@ -62,6 +62,11 @@ def bilinear_Lambdas(Data):
     Gmu = (amputated[1], amputated[2], amputated[4], amputated[8])
     qmuGmu = sum([aq[i]*Gmu[i] for i in range(4)])
     Data.Vq = (trace(dot(qmuGmu, dw.slash(aq))).real)*norm/Data.apSq
+    Gmu5 = (amputated[14], -amputated[13], amputated[11], -amputated[7])
+    qmuGmu5 = sum([aq[i]*Gmu5[i] for i in range(4)])
+    tmp = reduce(dot, [qmuGmu5, Gc[15], dw.slash(aq)]).real
+    Data.Vq5 = trace(tmp*norm)/Data.apSq
+    Data.Vq = (Data.Vq + Data.Vq5)/2 #fix
 
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),
@@ -209,9 +214,9 @@ def fourquark_Zs(Data):
     # (q, Y) - schemes, deltaS = 2 basis
     aq, apSq = Data.aq, Data.apSq
     Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*\
-                                                norm#*chiral_mask[:3,:3]
+                                                norm*chiral_mask[:3,:3]
     #Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
-    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))*chiral_mask[:3,:3]
+    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))#*chiral_mask[:3,:3]
     Data.Z_tmpq = inv(Data.Zinv_q)
     Data.fourquark_Zs['qg'] = Data.Z_tmpq*(VpA)*(VpA)  # (q, g)
     Data.fourquark_Zs['qq'] = Data.Z_tmpq*(Vq)*(Vq)    # (q, q)

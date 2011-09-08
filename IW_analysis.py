@@ -217,10 +217,16 @@ def print_results(data):
                 print d.Zinv_q
                 print "Lambda^{-1}:"
                 print d.Z_tmpq
+                #print d.step_scale[scheme]
             except:
                 print "output error"
-            print "Z:"
-            print combined_analysis.new(d.fourquark_Zs[scheme])
+            try:
+                print "Z:"
+                print combined_analysis.new(d.fourquark_Zs[scheme])
+                print "ssf:"
+                print combined_analysis.new(d.step_scale[scheme])
+            except:
+                print "output error"
             print ''
 
 def main():
@@ -229,7 +235,8 @@ def main():
     load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
-    
+   
+    global data004, data006, data008, data005, data01, data02
     if compute:
         print "Initializing data structures...",
         # Fine IW.
@@ -304,8 +311,10 @@ def main():
         # Step-scaling functions.
         
         # Should ss functions just be calculated on the fly? Little overhead.
-        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        #denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
+        #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        denomC = data0c[0]
+        denomF = data0f[0]
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
         map(do_ss(denomC), data0c)
@@ -313,14 +322,20 @@ def main():
         
         map(do_ss(denomF), data0f)
         map(do_ssJK(denomF), data0f)
-        
+        for d in data004, data006, data008, data005, data01, data02:
+            map(do_ss([d[0], d[1]]), d)
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
     kosher_f = pickle_root + '/IWf_chiral_pickle_11'
     kosher_c = pickle_root + '/IWc_chiral_pickle_11'
 
     kosher_f004 = pickle_root + '/IWf_004_pickle_11'
+    kosher_f006 = pickle_root + '/IWf_006_pickle_11'
+    kosher_f008 = pickle_root + '/IWf_008_pickle_11'
+
     kosher_c005 = pickle_root + '/IWc_005_pickle_11'
+    kosher_c01 = pickle_root + '/IWc_01_pickle_11'
+    kosher_c02 = pickle_root + '/IWc_02_pickle_11'
     
     if compute and dump:
         print "Pickling data...",
@@ -331,7 +346,16 @@ def main():
 
         with open(kosher_f004, 'w') as f:
             pickle.dump(data004, f)
+        with open(kosher_f006, 'w') as f:
+            pickle.dump(data006, f)
+        with open(kosher_f008, 'w') as f:
+            pickle.dump(data008, f)
+
         with open(kosher_c005, 'w') as f:
+            pickle.dump(data005, f)
+        with open(kosher_c01, 'w') as f:
+            pickle.dump(data02, f)
+        with open(kosher_c02, 'w') as f:
             pickle.dump(data005, f)
 
         print "complete"
@@ -343,12 +367,22 @@ def main():
         with open(kosher_c, 'r') as f:
             data0c = pickle.load(f)
 
-        with open(kosher_f004, 'r') as f:
-            data004 = pickle.load(f)
         with open(kosher_c005, 'r') as f:
             data005 = pickle.load(f)
+        with open(kosher_c01, 'r') as f:
+            data01 = pickle.load(f)
+        with open(kosher_c02, 'r') as f:
+            data02 = pickle.load(f)
+
+        with open(kosher_f004, 'r') as f:
+            data004 = pickle.load(f)
+        with open(kosher_f006, 'r') as f:
+            data006 = pickle.load(f)
+        with open(kosher_f008, 'r') as f:
+            data008 = pickle.load(f)
         print "complete."
     #print continuum_matrix(data0c, data0f, 'gg', -2)
+    
     print "Fine:"
     print_results([data008[0], data006[0], data004[0], data0f[0]])
     print_results([data008[1], data006[1], data004[1], data0f[1]])
@@ -357,7 +391,8 @@ def main():
     print_results([data02[0], data01[0], data005[0], data0c[0]])
     print_results([data02[1], data01[1], data005[1], data0c[1]])
     print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
-
+    
+    #print_results([data0c[-1], data0f[-1]])
     #plots
     if plot:
         print "Plotting results...",

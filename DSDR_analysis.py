@@ -80,15 +80,18 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
-    for scheme in 'gg',:
+    for scheme in 'qq',:
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
             try:
                 print "Lambda:"
-                print d.Zinv
+                print d.Zinv_q
                 print "Lambda^{-1}:"
-                print d.Z_tmp
+                print d.Z_tmpq
+                print "wf factor:"
+                print d.Vq
+                print d.Vq5
             except:
                 print "output error"
             print "Z:"

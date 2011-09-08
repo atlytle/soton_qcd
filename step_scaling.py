@@ -8,13 +8,25 @@ def sigma(Zf, Zi):
         return Zf/Zi
     else:
         return np.dot(Zf, np.linalg.inv(Zi))
-
+'''
 def step_scale(Data_f, Data_i):
     "Sigma in all four schemes."
     Data_f.step_scale = {}
     for scheme in 'gg', 'gq', 'qg', 'qq':
         Data_f.step_scale[scheme] = sigma(Data_f.fourquark_Zs[scheme],
                                           Data_i.fourquark_Zs[scheme])
+'''
+
+def step_scale(Data_f, *Dat_i):
+    '''Sigma for multiple matching points mu0.'''
+    Data_f.step_scale = {}
+    for scheme in 'gg', 'gq', 'qg', 'qq':
+        Data_f.step_scale[scheme] = [sigma(Data_f.fourquark_Zs[scheme],
+                                           d.fourquark_Zs[scheme])
+                                     for d in Dat_i]
+        if len(Dat_i) == 1:
+            Data_f.step_scale[scheme] = Data_f.step_scale[scheme][0]
+        
 
 def step_scale_sigma(Data_f, Data_i):
     '''Naive error propagation for step-scaling functions.'''
