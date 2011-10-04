@@ -154,6 +154,13 @@ def continuum_extrap(datac, dataf, scheme, O, P):
     
     return (x_, y, s)
 
+def continuum_extrapolate_point(datac, dataf, scheme):
+    '''Continuum extrapolation of step-scaling matrices.'''
+    ac = datac[0].a
+    af = dataf[0].a
+    pts = [(ac*ac, datac.step_scale[scheme], datac.step_scale_sigma[scheme]),
+           (af*af, dataf.step_scale[scheme], dataf.step_scale_sigma[scheme])]
+    return fits.line_fit(pts)
 def continuum_matrix(datac, dataf, scheme, x):
     '''Continuum step-scaling matrix at position x.'''
     ymu = lambda O, P: continuum_extrap(datac, dataf, scheme, O, P)[1][x]
@@ -208,7 +215,7 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
-    for scheme in 'gg',:
+    for scheme in 'gg', 'qq':
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
@@ -230,9 +237,9 @@ def print_results(data):
             print ''
 
 def main():
-    compute = True  # Compute ss-functions from raw data.
+    compute = False  # Compute ss-functions from raw data.
     dump = False     # Pickle results.
-    load = False    # Un-pickle pre-computed results.
+    load = True    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
    
@@ -311,10 +318,10 @@ def main():
         # Step-scaling functions.
         
         # Should ss functions just be calculated on the fly? Little overhead.
-        #denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
-        denomC = data0c[0]
-        denomF = data0f[0]
+        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
+        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        #denomC = data0c[0]
+        #denomF = data0f[0]
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
         map(do_ss(denomC), data0c)
@@ -322,8 +329,8 @@ def main():
         
         map(do_ss(denomF), data0f)
         map(do_ssJK(denomF), data0f)
-        for d in data004, data006, data008, data005, data01, data02:
-            map(do_ss([d[0], d[1]]), d)
+        #for d in data004, data006, data008, data005, data01, data02:
+            #map(do_ss([d[0], d[1]]), d)
     
     pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
     kosher_f = pickle_root + '/IWf_chiral_pickle_11'
@@ -381,8 +388,8 @@ def main():
         with open(kosher_f008, 'r') as f:
             data008 = pickle.load(f)
         print "complete."
-    #print continuum_matrix(data0c, data0f, 'gg', -2)
-    
+    #print continuum_matrix(data0c, data0f, 'gg', -1)
+    '''
     print "Fine:"
     print_results([data008[0], data006[0], data004[0], data0f[0]])
     print_results([data008[1], data006[1], data004[1], data0f[1]])
@@ -391,8 +398,8 @@ def main():
     print_results([data02[0], data01[0], data005[0], data0c[0]])
     print_results([data02[1], data01[1], data005[1], data0c[1]])
     print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
-    
-    #print_results([data0c[-1], data0f[-1]])
+    '''
+    print_results([data0c[-1], data0f[-1]])
     #plots
     if plot:
         print "Plotting results...",

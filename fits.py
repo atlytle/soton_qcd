@@ -23,7 +23,13 @@ def line_fit_2ptData(Data1, Data2):
         p1 = (Data1.m + mres, Data1.fourquark_Zs[s], Data1.fourquark_sigmaJK[s])
         p2 = (Data2.m + mres, Data2.fourquark_Zs[s], Data2.fourquark_sigmaJK[s])
         result.fourquark_Zs[s], result.fourquark_sigmaJK[s] = line_fit([p1, p2])
-
+        
+        # HACK to remove nans that occur from zeroing elements in data
+        areNans = np.isnan(result.fourquark_Zs[s])
+        result.fourquark_Zs[s][areNans] = 0.
+        areNans = np.isnan(result.fourquark_sigmaJK[s])
+        result.fourquark_sigmaJK[s][areNans] = 0.
+ 
     return result
 
 def line_fit_Data(*Dat):
@@ -43,7 +49,13 @@ def line_fit_Data(*Dat):
         points = [(d.m + mres, d.fourquark_Zs[s], d.fourquark_sigmaJK[s]) 
                   for d in Dat]
         result.fourquark_Zs[s], result.fourquark_sigmaJK[s] = line_fit(points)
-    
+        
+        # HACK to remove nans that occur from zeroing elements in data
+        areNans = np.isnan(result.fourquark_Zs[s])
+        result.fourquark_Zs[s][areNans] = 0.
+        areNans = np.isnan(result.fourquark_sigmaJK[s])
+        result.fourquark_sigmaJK[s][areNans] = 0.
+
     return result
 
 def line_fit(data):

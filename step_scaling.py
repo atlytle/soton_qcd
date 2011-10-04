@@ -27,7 +27,7 @@ def step_scale(Data_f, *Dat_i):
         if len(Dat_i) == 1:
             Data_f.step_scale[scheme] = Data_f.step_scale[scheme][0]
         
-
+#  The formula is off, see soton.tex
 def step_scale_sigma(Data_f, Data_i):
     '''Naive error propagation for step-scaling functions.'''
     Data_f.step_scale_sigma = {}

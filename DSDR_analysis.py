@@ -80,10 +80,11 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
-    for scheme in 'qq',:
+    for scheme in 'gg', 'qq',:
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
+            '''
             try:
                 print "Lambda:"
                 print d.Zinv_q
@@ -94,16 +95,19 @@ def print_results(data):
                 print d.Vq5
             except:
                 print "output error"
+            '''
             print "Z:"
             print new(d.fourquark_Zs[scheme])
+            print "sigma_Z:"
+            print new2(d.fourquark_sigmaJK[scheme])
             print ''
         print ''
     
 def main():
     
-    compute = True  # Compute Zs from raw data.
-    dump = True    # Pickle results.
-    load = False    # Un-pickle pre-computed results.
+    compute = False  # Compute Zs from raw data.
+    dump = False    # Pickle results.
+    load = True    # Un-pickle pre-computed results.
     plot = False     # Plot results. (not implemented)
     save = False    # Save plots. (not implemented)
 

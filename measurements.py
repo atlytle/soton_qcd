@@ -89,7 +89,12 @@ def bilinear_LambdaJK(Data):
         Gmu = (amputated[1], amputated[2], amputated[4], amputated[8])
         qmuGmu = sum([aq[i]*Gmu[i] for i in range(4)])
         return (trace(dot(qmuGmu, dw.slash(aq))).real)*norm/apSq
-    Data.Vq_JK = [Vq(amp) for amp in amputatedJK]
+    def Vq5(amputated):
+        Gmu5 = (amputated[14], -amputated[13], amputated[11], -amputated[7])
+        qmuGmu5 = sum([aq[i]*Gmu5[i] for i in range(4)])
+        tmp = reduce(dot, [qmuGmu5, Gc[15], dw.slash(aq)]).real
+        return trace(tmp*norm)/Data.apSq
+    Data.Vq_JK = [(Vq(amp)+Vq5(amp))/2 for amp in amputatedJK]
     Data.Vq_sigmaJK = JKsigma(Data.Vq_JK, Data.Vq)
  
 def bilinear_LambdaBoot(Data):
@@ -227,12 +232,13 @@ def fourquark_ZsJK(Data):
                                           JKsample(Data.fourquark_array))
     norm = (Data.V)**3
     # Lambdas.
-    Lambda = lambda amp: (fourquark_proj_g(amp).real)*norm
+    Lambda = lambda amp: (fourquark_proj_g(amp).real)*norm*chiral_mask
     Data.Lambda_JK = map(Lambda, amputatedJK)
     Data.Lambda_sigmaJK = JKsigma(Data.Lambda_JK, Data.fourquark_Lambda)
     
     aq, apSq = Data.aq, Data.apSq
-    Lambda_q = lambda amp: (fourquark_proj_q(amp, aq, apSq).real)*norm
+    Lambda_q = lambda amp: (fourquark_proj_q(amp, aq, apSq).real)*\
+                                                        norm*chiral_mask[:3,:3]
     Data.Lambda_JK_q = map(Lambda_q, amputatedJK)
     Data.Lambda_sigmaJK_q = JKsigma(Data.Lambda_JK_q, Data.fourquark_Lambda_q)
 
