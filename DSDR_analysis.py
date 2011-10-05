@@ -44,6 +44,7 @@ def extract_data(data, scheme, O, P):
     y = [d.fourquark_Zs[scheme][O][P] for d in data]
     s = [d.fourquark_sigmaJK[scheme][O][P] for d in data]
     return (x, y, s)
+
 def plot_data(data_, scheme, O, P, save=False):
     '''Plot Zs vs (ap)^2 at finite am and in chiral limit.'''
     
@@ -122,8 +123,23 @@ def main():
         with open(DSDR_chiral, 'r') as f:
             data0 = pickle.load(f)
 
-    plot_data([data0042, data001, data0], 'gg', 2, 1)
-    
+    print data0[5].fourquark_Zs['gg'][3:,3:]
+    print ''
+    print data0[5].fourquark_Zs['qg'][3:,3:]
+    if plot:
+        plot_data([data0042, data001, data0], 'gg', 1, 1)
+        plot_data([data0042, data001, data0], 'qg', 1, 1)
+        
+        plot_data([data0042, data001, data0], 'qg', 4, 4)
+        plot_data([data0042, data001, data0], 'gg', 4, 4)
+        '''
+        plot_data([data0042, data001, data0], 'qg', 3, 4)
+        plot_data([data0042, data001, data0], 'gg', 3, 4)
+        plot_data([data0042, data001, data0], 'qg', 4, 3)
+        plot_data([data0042, data001, data0], 'gg', 4, 3)
+        plot_data([data0042, data001, data0], 'qg', 4, 4)
+        plot_data([data0042, data001, data0], 'gg', 4, 4)
+        '''
     # Output results.
     #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
     #out.write_Zs(data0042, root + '/Z_am0042_non-exceptional_gamma_new.dat')

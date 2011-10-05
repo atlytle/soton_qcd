@@ -164,11 +164,11 @@ def proj_q5mix(amputated, aq):
 
 def proj_sigma(amputated, aq):
     "Contract amputated fourquark correlator w/ sigma.q x sigma.q projector."
-    result = np.zeros(12, 12, 12, 12)
-    sdq = sigma_dot_q(aq, color=True)
+    result = 0
+    sdq = dw.sigma_dot_q(aq, color=True)
     for mu in range(4):
-        tmp = tensordot(sdq, amputated, ([0,1], [1,0]))
-        result += tensordot(sdq, tmp, ([0,1], [1,0]))
+        tmp = tensordot(sdq[mu], amputated, ([0,1], [1,0]))
+        result += tensordot(sdq[mu], tmp, ([0,1], [1,0]))
     return result
 
 def proj_sigma_mix(amputated, aq):
@@ -196,12 +196,16 @@ def fourquark_proj_q(amputated, aq, apSq):
     proj_BK = lambda amp: (proj_q(amp, aq) + proj_q5(amp, aq))/apSq
     proj_VVmAA = lambda amp: (proj_q(amp, aq) - proj_q5(amp, aq))/apSq
     proj_VVmAA_mx = lambda amp: (proj_qmix(amp, aq) -
-                                 proj_q5mix(amp, aq))/apSq #SS-PP
+                                 proj_q5mix(amp, aq))/apSq  # SS-PP
+    proj_TT_mx = lambda amp: proj_sigma_mix(amp, aq)/apSq   # SS+PP
+    proj_TT = lambda amp: proj_sigma(amp, aq)/apSq
  
     def projectors(x):
-        return [proj_BK(x), proj_VVmAA(x), proj_VVmAA_mx(x)]
+        return [proj_BK(x), proj_VVmAA(x), proj_VVmAA_mx(x),
+                proj_TT_mx(x), proj_TT(x)]
 
-    cfncs = [G_VVpAA(amputated), G_VVmAA(amputated), G_SSmPP(amputated)]
+    cfncs = [G_VVpAA(amputated), G_VVmAA(amputated), G_SSmPP(amputated),
+             G_SSpPP(amputated), G_TT(amputated)]
 
     return array(map(projectors, cfncs))
     
@@ -273,9 +277,11 @@ F_gg = array([[1536., 0, 0, 0, 0,],
               [0, 0, 0, 240., 144.],
               [0, 0, 0, 144., 1008.]])
 
-F_qq = array([[384, 0, 0],
-              [0, 288, 96],
-              [0, -48, -144]])
+F_qq = array([[384, 0, 0, 0, 0],
+              [0, 288, 96, 0, 0],
+              [0, -48, -144, 0, 0],
+              [0, 0, 0, 216, 72],
+              [0, 0, 0, 360, 504]])
 
 chiral_mask = array([[1, 0, 0, 0, 0],
                      [0, 1, 1, 0, 0],

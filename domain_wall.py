@@ -134,7 +134,7 @@ def sigmaMixArray(aq):
 
     r = np.zeros((12, 12, 12, 12), complex) # !
     for i, j, k, l in product(range(12), repeat=4):
-        r[i][j][k][l] = qqMixProj(i, j, k, l)
+        r[i][j][k][l] = sigmaMixProj(i, j, k, l)
     return r
 
 
