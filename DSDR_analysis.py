@@ -80,22 +80,11 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
+    '''Print results of DSDR_analysis.'''
     for scheme in 'gg', 'qq',:
         print "____{0}-scheme____".format(scheme)
         for d in data:
             print "am={0}, mu={1}".format(d.m, d.mu)
-            '''
-            try:
-                print "Lambda:"
-                print d.Zinv_q
-                print "Lambda^{-1}:"
-                print d.Z_tmpq
-                print "wf factor:"
-                print d.Vq
-                print d.Vq5
-            except:
-                print "output error"
-            '''
             print "Z:"
             print new(d.fourquark_Zs[scheme])
             print "sigma_Z:"
@@ -168,15 +157,7 @@ def main():
         plot_data([data0042, data001, data0], 'qg', 4, 4)
         plot_data([data0042, data001, data0], 'gg', 4, 4)
         '''
-    # Output results.
-    #root = '/Users/atlytle/Dropbox/TeX_docs/AuxDet_NPR/fourFermi/plots'
-    #out.write_Zs(data0042, root + '/Z_am0042_non-exceptional_gamma_new.dat')
-    #out.write_Zs(data001,  root + '/Z_am001_non-exceptional_gamma_new.dat')
-    #out.write_Zs(data0, root + '/Z_chiral_non-exceptional_gamma.dat')
-    
-    #root = '/Users/atlytle/Dropbox/TeX_docs/soton/Kpipi/NPR/'
-    #out.write_Zs_TeX_2([data0[2]], root + 'Z_chiral_1.5')
-    #out.write_Zs_TeX_2([data0[0]], root + 'Z_chiral_1.1')
+
     return 0
 
 if __name__ == "__main__":

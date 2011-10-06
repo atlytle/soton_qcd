@@ -2,7 +2,6 @@ import pickle, sys
 import numpy as np
 import IW_analysis
 from matching import alpha_s2, alpha_s3, C_178
-#from IW_analysis import continuum_matrix
 
 pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
 DSDR_chiral = pickle_root + '/DSDR_chiral_pickle'
@@ -84,21 +83,6 @@ def main():
     with open(IWc_chiral_11, 'r') as f:
         IWc_chiral_11 = pickle.load(f)
     
-    '''    
-    print 'Matching points 1.5 GeV, 3 GeV\n'
-    Z_DSDR =  DSDR_chiral[2]
-    IWc_chiral = IWc_chiral_15
-    IWf_chiral = IWf_chiral_15
-    
-    
-    for scheme in 'gg', 'gq', 'qg', 'qq':
-        print '____({0}, {1}) - scheme____\n'.format(*scheme)
-        Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
-        dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
-        ss = continuum_matrix(IWc_chiral, IWf_chiral, scheme, -2)
-        C = C_178(alpha_s3, scheme)
-        print_results(C, new(ss[0]), new2(ss[1]), new(Z), new2(dZ), ZA, dZA)
-    '''
     ####
 
     print 'Matching points 1.145 GeV, 3 GeV\n'
@@ -112,9 +96,6 @@ def main():
         dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss, dss = IW_analysis.continuum_matrix(IWc_chiral,
                                                IWf_chiral, scheme, -1) #was -2
-        #IWf_result = IWf_chiral[-1].step_scale[scheme][:3,:3]
-        #dss_extrap = abs(ss - IWf_result)
-        #print dss_extrap
         C = C_178(alpha_s3, scheme)
         print_results(C, new(ss), new2(dss), new(Z), new2(dZ), ZA, dZA)
 

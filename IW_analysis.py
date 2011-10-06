@@ -96,11 +96,6 @@ def calc_Zs(Data):
     Data.clear()
     return Data
 
-ss_dict = {'gg': 'step_scale', 'gq': 'step_scale_q',
-           'qg': 'step_scale_qg', 'qq': 'step_scale_qq'}
-ss_sigma_dict = {'gg': 'step_scale_sigma', 'gq': 'step_scale_sigma_q',
-                 'qg': 'step_scale_sigma_qg', 'qq': 'step_scale_sigma_qq'}
-
 def interpolation(data, scheme, O, P):
     '''Interpolating function for step-scaling data.'''
 
@@ -161,6 +156,7 @@ def continuum_extrapolate_point(datac, dataf, scheme):
     pts = [(ac*ac, datac.step_scale[scheme], datac.step_scale_sigma[scheme]),
            (af*af, dataf.step_scale[scheme], dataf.step_scale_sigma[scheme])]
     return fits.line_fit(pts)
+
 def continuum_matrix(datac, dataf, scheme, x):
     '''Continuum step-scaling matrix at position x.'''
     ymu = lambda O, P: continuum_extrap(datac, dataf, scheme, O, P)[1][x]
@@ -215,6 +211,7 @@ def plot_data(data_, scheme, O, P, save=False):
         p.show()
 
 def print_results(data):
+    '''Print results for step-scaling data.'''
     for scheme in 'gg', 'qq':
         print "____{0}-scheme____".format(scheme)
         for d in data:
