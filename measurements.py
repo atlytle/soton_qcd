@@ -148,6 +148,8 @@ def proj_g(amputated, gspec):
         result.append(tensordot(Gc[g], tmp, ([0,1], [1,0])))
     return sum(result)
 
+# consolidate proj_q, proj_q5 w/ pseudo tag; q, qmix w/ color tag; g, q w/ ...
+# split off a different file called projectors...
 def proj_q(amputated, aq):
     "Contract amputated fourquark correlator w/ qslash x qslash projector."
     qslash = dw.slash(aq)
@@ -170,6 +172,20 @@ def proj_q5mix(amputated, aq):
     #return tensordot(proj, amputated, ([1,0,3,2], [0,1,2,3]))
     return np.sum(proj*amputated)
 
+def proj_sigma(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q x sigma.q projector."
+    result = 0
+    sdq = dw.sigma_dot_q(aq, color=True)
+    for mu in range(4):
+        tmp = tensordot(sdq[mu], amputated, ([0,1], [1,0]))
+        result += tensordot(sdq[mu], tmp, ([0,1], [1,0]))
+    return result
+
+def proj_sigma_mix(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q x sigma.q mixed."
+    proj = dw.sigmaMixArray(aq)
+    return np.sum(proj*amputated)
+
 def fourquark_proj_g(amputated):
     "Convert amputated Green functions into 5x5 matrix."
     P_VVpAA = [1, 2, 4, 8, 14, 13, 11, 7]
@@ -190,12 +206,16 @@ def fourquark_proj_q(amputated, aq, apSq):
     proj_BK = lambda amp: (proj_q(amp, aq) + proj_q5(amp, aq))/apSq
     proj_VVmAA = lambda amp: (proj_q(amp, aq) - proj_q5(amp, aq))/apSq
     proj_VVmAA_mx = lambda amp: (proj_qmix(amp, aq) -
-                                 proj_q5mix(amp, aq))/apSq #SS-PP
+                                 proj_q5mix(amp, aq))/apSq  # SS-PP
+    proj_TT_mx = lambda amp: proj_sigma_mix(amp, aq)/apSq   # SS+PP
+    proj_TT = lambda amp: proj_sigma(amp, aq)/apSq
  
     def projectors(x):
-        return [proj_BK(x), proj_VVmAA(x), proj_VVmAA_mx(x)]
+        return [proj_BK(x), proj_VVmAA(x), proj_VVmAA_mx(x),
+                proj_TT_mx(x), proj_TT(x)]
 
-    cfncs = [G_VVpAA(amputated), G_VVmAA(amputated), G_SSmPP(amputated)]
+    cfncs = [G_VVpAA(amputated), G_VVmAA(amputated), G_SSmPP(amputated),
+             G_SSpPP(amputated), G_TT(amputated)]
 
     return array(map(projectors, cfncs))
     
@@ -272,9 +292,11 @@ F_gg = array([[1536., 0, 0, 0, 0,],
               [0, 0, 0, 240., 144.],
               [0, 0, 0, 144., 1008.]])
 
-F_qq = array([[384, 0, 0],
-              [0, 288, 96],
-              [0, -48, -144]])
+F_qq = array([[384, 0, 0, 0, 0],
+              [0, 288, 96, 0, 0],
+              [0, -48, -144, 0, 0],
+              [0, 0, 0, 216, 72],
+              [0, 0, 0, 360, 504]])
 
 # Decouple the sectors.
 chiral_mask = array([[1., 0, 0, 0, 0],
