@@ -84,6 +84,7 @@ class Data:
         else:
             pass
     
+    # Locations of data structures.
     def prop_location(self, gf, io):
         rest = '.{0}.q{1}.npy'.format(gf, io)
         return self.root + rest
@@ -96,6 +97,20 @@ class Data:
         rest = '.{0}.fq{1}.npy'.format(gf, gamma)
         return self.root + rest
 
+    def Aconn_location(self, gf, gamma): #stochastic number?
+        rest = '.{0}.Aconn{1}.npy'.format(gf, gamma)
+        return self.root + rest
+    
+    def Bconn_location(self, gf, gamma): #stochastic number?
+        rest = '.{0}.Bconn{1}.npy'.format(gf, gamma)
+        return self.root + rest
+
+   def spect_location(self, gf): #stochastic number?
+        rest = '.{0}.spect.npy'.format(gf)
+        return self.root + rest
+
+
+    # Loading routines.
     def bilin_load(self, gf, gamma):
         '''Hack to return the correct bilinear correlation function.'''
         bilin = np.load(self.bilin_location(gf, 15-gamma))
@@ -106,6 +121,16 @@ class Data:
 
     def fourquark_load(self, gf, gamma):
         return np.load(self.fourquark_location(gf, gamma))
+
+    def Aconn_load(self, gf, gamma): #stochastic number?
+        return np.load(self.Aconn_location(gf, gamma))
+
+    def Bconn_load(self, gf, gamma): #stochastic number?
+        return np.load(self.Bconn_location(gf, gamma))
+
+    def spect_load(self, gf): #stochastic number?
+        return np.load(self.spect_location(gf))
+        
 
     def clear(self):
         '''Delete references to memory intensive data structures.'''
