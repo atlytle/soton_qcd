@@ -56,14 +56,14 @@ class Data:
         self.m, self.p, self.tw, self.gauge_list = m, p, tw, gauge_list
         self.p2 = in2out(p) # you should give these better names
         self.loaded = False
-
-        # contingent on subclass, wrap in try?
+        
+    def populate_kinematic_variables(self):
+        '''Requires that L, T, and a are defined.'''
         self.ap = dw.ap(p, tw, self.L, self.T)
         self.ap2 = dw.ap(self.p2, tw, self.L, self.T)
         self.aq = dw.aq(self.ap, self.ap2)  # ap - ap2
         self.apSq = dw.inner(self.ap)  # (ap)^2
         self.mu = dw.mu(self.ap, self.a)
-
 
     def load(self):
         '''Load data structures stored on disk.'''
@@ -105,7 +105,7 @@ class Data:
         rest = '.{0}.Bconn{1}.npy'.format(gf, gamma)
         return self.root + rest
 
-   def spect_location(self, gf): #stochastic number?
+    def spect_location(self, gf): #stochastic number?
         rest = '.{0}.spect.npy'.format(gf)
         return self.root + rest
 
@@ -140,6 +140,35 @@ class Data:
         del self.fourquark_array
         self.loaded = False
 
+class Spectator_Data(Data):
+
+    def __init__(self, m, p, tw, gauge_list):
+        Data.__init__(self, m, p, tw, gauge_list)
+        self.root = '/Users/atlytle/Documents/spectator_test/npy/'\
+                    'spect_{0}_{1}_tw{2}'.format(pstring(p), str(m), mmap(tw))
+    
+    def load(self):
+        self.spect_array = [self.spect_load(gf) for gf in self.gauge_list]
+        self.Aconn_array = [array([self.Aconn_load(gf, gamma) 
+                       for gamma in range(16)])
+                       for gf in self.gauge_list]
+        self.Bconn_array = [array([self.Bconn_load(gf, gamma) 
+                       for gamma in range(16)])
+                       for gf in self.gauge_list]
+        
+        Aspect_array = []
+        Bspect_array = []
+        for gf in range(len(self.gauge_list)):
+            A_ = self.Aconn_array[gf]
+            B_ = self.Bconn_array[gf]
+            spect = self.spect_array[gf]
+            Aspect_array.append(array([tensordot(A, spect, 0) for A in A_])) #+=
+            Bspect_array.append(array([tensordot(B, spect, 0) for B in B_]))
+        
+        self.Aspect_array = Aspect_array
+        self.Bspect_array = Bspect_array
+        
+
 class DSDR_Data(Data):
 
     L, T = 32., 64.
@@ -150,7 +179,7 @@ class DSDR_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-
+        populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/AuxDetNPR/'\
                     'm{0}/npy/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
@@ -165,7 +194,7 @@ class IWf_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-
+        populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/32x64/'\
                     'm{0}/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
@@ -180,7 +209,7 @@ class IWc_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-
+        populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/24x64/'\
                     'm{0}/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
