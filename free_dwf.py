@@ -1,6 +1,7 @@
 import math
 from numpy import dot
 
+# dwf-function-defs.nb
 def phat(p):
     hat = lambda p: 2*math.sin(p/2.)
     return map(hat, p)
@@ -37,7 +38,17 @@ def zz(p, M):
     y = yy(p, M)
     return y/2. + math.sqrt(y*y/4. - w*w)
 
+# free-dwf-propagator.nb
+def pslash(p):
+    pass
 
+def prop(p, m, M, Ls):
+    '''Free momentum space propagator, S(p).'''
+    pass
+
+def prop_x(x, p, m, M, Ls):
+    "S(x, p)"
+    pass
         
 
     
