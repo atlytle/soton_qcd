@@ -1,4 +1,4 @@
-import math, sys
+import math, sys, itertools
 import numpy as np
 from numpy import array, dot
 
@@ -19,7 +19,7 @@ def ea(p, M):
     w = W(p, M)
     pb = pbar(p)
     pb_sq = dot(pb, pb)
-    ch = 1 + w*w + pb_sq/(2.*abs(w))
+    ch = (1 + w*w + pb_sq)/(2.*abs(w))
     return ch + math.sqrt(ch*ch-1)
 
 def xx(p, M):
@@ -61,29 +61,47 @@ g[4] = g[0]
 g[5] = reduce(dot, [g[1], g[2], g[3], g[4]])
 id4 = np.identity(4)
 
+Pp = (id4 + g[5])/2.
+Pm = (id4 - g[5])/2.
+Pstat = (id4 + g[0])/2.
+
+def ap(n_tuple, L, T):
+    n = n_tuple
+    pi = math.pi
+    return (2*pi*n[0]/T, 2*pi*n[1]/L, 2*pi*n[2]/L, 2*pi*n[3]/L)
+
+def four_dot(a, b):
+    '''Dot product of four-vectors.'''
+    return sum([a[i]*b[i] for i in range(4)])
+
 def pslash(p):  # Note different index convention!
     return sum([p[i]*g[i] for i in range(4)])
 
-def prop(p, m, M, Ls):
+def mompropLs(p, m, M, Ls):
     '''Free momentum space propagator, S(p).'''
     pbar_sl = pslash(pbar(p))
     w = W(p, M)
     z = zz(p, M)
     owe = 1 - w*w/z
     ea = z/w #dif from ea(...)?
-    fac = (z-w*w/z)/(ea**(2*N)-1)
-    f = 1 - z - m*m*owe + fac*(2*m*ea**N - 1 - m*m)
-    return (-1j*pbar_sl + m*owe*id4)/(z + m*m*owe - 1) #def id4!
+    fac = (z-w*w/z)/(ea**(2*Ls)-1) #N=Ls?
+    f = 1 - z - m*m*owe + fac*(2*m*ea**Ls - 1 - m*m)
+    return (1j*pbar_sl + (-m*owe + fac*(ea**Ls - m))*id4)/f 
 
-def prop_x(x, p, m, M, Ls):
-    "S(x, p)"
-    pass
-        
-# main
+def propagatorLs(x, m, M, L, T, Ls):
+    "S(x, 0)"
+    result = np.zeros((4,4), 'complex')
+    for n in itertools.product(range(0,T), range(0,L), range(0,L), range(0,L)):
+      #print ap(n, L, T)
+      p = ap(n, L, T)
+      phase = four_dot(p, x) #just use dot numpy arrays?
+      eipx = complex(math.cos(phase), math.sin(phase))
+      result += mompropLs(p, m, M, Ls)*eipx
+    return result/(L*L*L*T)
+
 def main():
-    L, T, M, m = 4, 8, 1.8, 1.9
+    L, T, M, m, Ls = 4, 8, 1.8, 1.0, 16
     return 0
 
 if __name__ == "__main__":
     sys.exit(main())
-    
