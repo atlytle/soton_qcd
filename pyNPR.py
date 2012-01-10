@@ -59,8 +59,8 @@ class Data:
         
     def populate_kinematic_variables(self):
         '''Requires that L, T, and a are defined.'''
-        self.ap = dw.ap(p, tw, self.L, self.T)
-        self.ap2 = dw.ap(self.p2, tw, self.L, self.T)
+        self.ap = dw.ap(self.p, self.tw, self.L, self.T)
+        self.ap2 = dw.ap(self.p2, self.tw, self.L, self.T)
         self.aq = dw.aq(self.ap, self.ap2)  # ap - ap2
         self.apSq = dw.inner(self.ap)  # (ap)^2
         self.mu = dw.mu(self.ap, self.a)
@@ -179,7 +179,7 @@ class DSDR_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-        populate_kinematic_variables()
+        self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/AuxDetNPR/'\
                     'm{0}/npy/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
@@ -194,7 +194,7 @@ class IWf_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-        populate_kinematic_variables()
+        self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/32x64/'\
                     'm{0}/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
@@ -209,7 +209,7 @@ class IWc_Data(Data):
     def __init__(self, m, p, tw, gauge_list):
 
         Data.__init__(self, m, p, tw, gauge_list)
-        populate_kinematic_variables()
+        self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/24x64/'\
                     'm{0}/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
