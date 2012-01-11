@@ -358,9 +358,9 @@ def main():
         with open(kosher_c005, 'w') as f:
             pickle.dump(data005, f)
         with open(kosher_c01, 'w') as f:
-            pickle.dump(data02, f)
+            pickle.dump(data01, f)
         with open(kosher_c02, 'w') as f:
-            pickle.dump(data005, f)
+            pickle.dump(data02, f)
 
         print "complete"
 
