@@ -1,5 +1,6 @@
 import sys
 import pickle
+import itertools
 import numpy as np
 import pylab as p
 from scipy.interpolate import interp1d
@@ -95,40 +96,41 @@ def calc_Zs(Data):
     Data.clear()
     return Data
 
-def plot_data(data_, scheme, O, P, save=False):
-    '''Plot of step-scale function vs mu.'''
+def extract_data(data, scheme, O, P):
+    '''Extract Zs for plotting.'''
+    x = [d.apSq for d in data]
+    y = [d.fourquark_Zs[scheme][O][P] for d in data]
+    s = [d.fourquark_sigmaJK[scheme][O][P] for d in data]
+    return (x, y, s)
 
-    assert(len(data_) == 2)  # coarse, fine 
-    colors = ['r', 'b']
+def plot_data(data_, scheme, O, P, legend_spec, save=False, name_spec=''):
+    '''Plot Zs vs (ap)^2 at finite am and in chiral limit.'''
+    
+    mark = ['o', 'o', 'o', 'o-k']
     id=0
-    p.figure()
     title = {'gg': '\gamma^{\mu}, \gamma^{\mu}', 'gq': '\gamma^{\mu}, q',
              'qg': 'q, \gamma^{\mu}', 'qq': 'q, q'}
-    p.title('$({0}) - \mathrm{{scheme}}$'.format(title[scheme]))
-    p.xlabel('$\mu \, (\mathrm{GeV})$', fontsize=16)
     label = str(O+1) + str(P+1)
-    p.ylabel('$\sigma_{0}$'.format('{'+label+'}'), fontsize=16)
     legend = ()
 
-    for data in data_:
-        x_, y_, s_, x, y, s = interpolation(data, scheme, O, P)
-        dada = p.plot(x, y, 'o', x_, y_(x_), '-',
-                      x_, y_(x_)+s_(x_), '--', x_, y_(x_)-s_(x_), '--')
-        legend += dada[1],
-        p.setp(dada, color=colors[id])
-        id = id + 1
+    p.figure()
+    p.title('$({0}) - \mathrm{{scheme}}$'.format(title[scheme]))
+    p.xlabel('$(ap)^{2}$')
+    p.ylabel('$ Z_{0} / Z_A^2$'.format('{'+label+'}'), fontsize=16)
     
-    x_, y, s = continuum_extrap(data_[0], data_[1], scheme, O, P)
-    dada = p.plot(x_, y, '-', x_, y+s, '--', x_, y-s, '--')
-    legend += dada[0],
-    p.setp(dada,  color='green')
-    p.legend(legend, ('$a=0.116 \, \mathrm{fm}$',
-                      '$a=0.088 \, \mathrm{fm}$', '$a=0$'), 'best') 
+    for data in data_:
+        x, y, s = extract_data(data, scheme, O, P)
+        dada = p.errorbar(x, y, yerr=s, fmt=mark[id])
+        legend += dada[0],
+        id += 1
+    p.legend(legend, legend_spec, 'best')
     if save:
-        root = '/Users/atlytle/Dropbox/TeX_docs/soton/step-scaling/plots'
-        p.savefig(root + '/sigma_{0}_{1}.pdf'.format(scheme, label))
+        root = '/Users/atlytle/Dropbox/TeX_docs/soton'\
+               '/SUSY_BK/plots'
+        p.savefig(root + '/Z_{0}_{1}_{2}.pdf'.format(name_spec, scheme, label))
     else:
         p.show()
+
 
 def print_results(data):
     '''Print results for step-scaling data.'''
@@ -154,11 +156,11 @@ def print_results(data):
             print ''
 
 def main():
-    compute = True  # Compute ss-functions from raw data.
+    compute = False  # Compute Z-factors from raw data.
     dump = False     # Pickle results.
-    load = False    # Un-pickle pre-computed results.
-    plot = False     # Plot results.
-    save = False    # Save plots.
+    load = True    # Un-pickle pre-computed results.
+    plot = True     # Plot results.
+    save = True    # Save plots.
    
     global data004, data006, data008, data005, data01, data02
     if compute:
@@ -207,7 +209,7 @@ def main():
         print [d.mu for d in data02]
 
         print "complete"
-        '''
+        
         print "Computing Zs...",
         # Compute results.
         pool = Pool()
@@ -230,103 +232,60 @@ def main():
         # Chiral Limits.
         data0c = map(fits.line_fit_Data, data005, data01, data02)
         data0f = map(fits.line_fit_Data, data004, data006, data008)
-     
-        # Step-scaling functions.
-        
-        # Should ss functions just be calculated on the fly? Little overhead.
-        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
-        #denomC = data0c[0]
-        #denomF = data0f[0]
-        # why not take chiral limit of step-scale functions??
-        # would this not have less m dependence? A: need booststrap
-        map(do_ss(denomC), data0c)
-        map(do_ssJK(denomC), data0c)
-        
-        map(do_ss(denomF), data0f)
-        map(do_ssJK(denomF), data0f)
-        #for d in data004, data006, data008, data005, data01, data02:
-            #map(do_ss([d[0], d[1]]), d)
-    
-    pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle'
-    kosher_f = pickle_root + '/IWf_chiral_pickle_11'
-    kosher_c = pickle_root + '/IWc_chiral_pickle_11'
-
-    kosher_f004 = pickle_root + '/IWf_004_pickle_11'
-    kosher_f006 = pickle_root + '/IWf_006_pickle_11'
-    kosher_f008 = pickle_root + '/IWf_008_pickle_11'
-
-    kosher_c005 = pickle_root + '/IWc_005_pickle_11'
-    kosher_c01 = pickle_root + '/IWc_01_pickle_11'
-    kosher_c02 = pickle_root + '/IWc_02_pickle_11'
-    '''    
+   
     if compute and dump:
-        print "Pickling data...",
-        with open(kosher_f, 'w') as f:
-            pickle.dump(data0f, f)
-        with open(kosher_c, 'w') as f:
-            pickle.dump(data0c, f)
+        print "Pickling data...",    
+        pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle/SUSY_BK'
+        pickle_dict = \
+            {'/IWf_chiral_pickle': data0f, '/IWc_chiral_pickle': data0c,
+             '/IWf_004_pickle': data004, '/IWf_006_pickle': data006,
+             '/IWf_008_pickle': data008, '/IWc_005_pickle': data005,
+             '/IWc_01_pickle': data01, '/IWc_02_pickle': data02}
 
-        with open(kosher_f004, 'w') as f:
-            pickle.dump(data004, f)
-        with open(kosher_f006, 'w') as f:
-            pickle.dump(data006, f)
-        with open(kosher_f008, 'w') as f:
-            pickle.dump(data008, f)
-
-        with open(kosher_c005, 'w') as f:
-            pickle.dump(data005, f)
-        with open(kosher_c01, 'w') as f:
-            pickle.dump(data02, f)
-        with open(kosher_c02, 'w') as f:
-            pickle.dump(data005, f)
-
+        for name, data in pickle_dict.iteritems():
+            with open(pickle_root+name, 'w') as f:
+                pickle.dump(data, f)
+        
         print "complete"
 
     if load:
         print "Un-pickling data...",
-        with open(kosher_f, 'r') as f:
-            data0f = pickle.load(f)
-        with open(kosher_c, 'r') as f:
-            data0c = pickle.load(f)
-
-        with open(kosher_c005, 'r') as f:
-            data005 = pickle.load(f)
-        with open(kosher_c01, 'r') as f:
-            data01 = pickle.load(f)
-        with open(kosher_c02, 'r') as f:
-            data02 = pickle.load(f)
-
-        with open(kosher_f004, 'r') as f:
-            data004 = pickle.load(f)
-        with open(kosher_f006, 'r') as f:
-            data006 = pickle.load(f)
-        with open(kosher_f008, 'r') as f:
+        pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle/SUSY_BK'
+        with open(pickle_root+'/IWf_008_pickle', 'r') as f:
             data008 = pickle.load(f)
+        with open(pickle_root+'/IWf_006_pickle', 'r') as f:
+            data006 = pickle.load(f)
+        with open(pickle_root+'/IWf_004_pickle', 'r') as f:
+            data004 = pickle.load(f)
+        with open(pickle_root+'/IWc_02_pickle', 'r') as f:
+            data02 = pickle.load(f)
+        with open(pickle_root+'/IWc_01_pickle', 'r') as f:
+            data01 = pickle.load(f)
+        with open(pickle_root+'/IWc_005_pickle', 'r') as f:
+            data005 = pickle.load(f)
+        with open(pickle_root+'/IWc_chiral_pickle', 'r') as f:
+            data0c = pickle.load(f)
+        with open(pickle_root+'/IWf_chiral_pickle', 'r') as f:
+            data0f = pickle.load(f)
+        
         print "complete."
-    #print continuum_matrix(data0c, data0f, 'gg', -1)
-    '''
-    print "Fine:"
-    print_results([data008[0], data006[0], data004[0], data0f[0]])
-    print_results([data008[1], data006[1], data004[1], data0f[1]])
-    print_results([data008[-1], data006[-1], data004[-1], data0f[-1]])
-    print "Coarse:"
-    print_results([data02[0], data01[0], data005[0], data0c[0]])
-    print_results([data02[1], data01[1], data005[1], data0c[1]])
-    print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
-    print_results([data0c[-1], data0f[-1]])
-    '''
-    #plots
+
+    # Plots.
     if plot:
         print "Plotting results...",
-        plot_data([data0c, data0f], 'gg', 0, 0, save)
-        plot_data([data0c, data0f], 'gg', 1, 1, save)
-        plot_data([data0c, data0f], 'gg', 2, 2, save)
-        plot_data([data0c, data0f], 'gg', 1, 2, save)
-        plot_data([data0c, data0f], 'gg', 2, 1, save)
+        coarse_legend = ('$am=.02$', '$am=.01$', '$am=.005$', '$am=-m_{res}$')
+        fine_legend = ('$am=.008$', '$am=.006$', '$am=.004$', '$am=-m_{res}$')
+        # Plot coarse data.
+        for O, P in itertools.product(range(5), range(5)):
+            plot_data([data02, data01, data005, data0c], 
+                             'qq', O, P, coarse_legend, save, 'coarse')
+        # Plot fine data.
+        for O, P in itertools.product(range(5), range(5)):
+            plot_data([data008, data006, data004, data0f], 
+                             'qq', O, P, fine_legend, save, 'fine')
         print "complete"
 
-    print "IW_analysis complete."
+    print "IW_SUSY_analysis complete."
     
     return 0
 
