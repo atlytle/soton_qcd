@@ -170,14 +170,12 @@ class Spectator_Data(Data):
         
 
 class DSDR_Data(Data):
-
     L, T = 32., 64.
     V = (L**3)*T
     a = 1/1.37475  # 1/GeV
     mres = .0018347
 
     def __init__(self, m, p, tw, gauge_list):
-
         Data.__init__(self, m, p, tw, gauge_list)
         self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/AuxDetNPR/'\
@@ -185,14 +183,12 @@ class DSDR_Data(Data):
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
  
 class IWf_Data(Data):
-    
     L, T = 32., 64.
     V = (L**3)*T
     a = 1/2.282  # 1/GeV
     mres = .0006664
 
     def __init__(self, m, p, tw, gauge_list):
-
         Data.__init__(self, m, p, tw, gauge_list)
         self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/32x64/'\
@@ -200,17 +196,55 @@ class IWf_Data(Data):
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
  
 class IWc_Data(Data):
-
     L, T = 24., 64.
     V = (L**3)*T
     a = 1/1.730  # 1/GeV
     mres = .003152
 
     def __init__(self, m, p, tw, gauge_list):
-
         Data.__init__(self, m, p, tw, gauge_list)
         self.populate_kinematic_variables()
         self.root = '/Users/atlytle/Documents/IwasakiNPR/24x64/'\
                     'm{0}/gfmomNE_{1}_{2}_{0}_tw{3}'.format(
                      str(m), pstring(p), pstring(self.p2), mmap(tw))
- 
+
+class IWc_Exceptional_Data(Data):
+    L, T = 24., 64.
+    V = (L**3)*T
+    a = 1/1.730  # 1/GeV
+    mres = .003152
+
+    def __init__(self, m, p, tw, gauge_list):
+        Data.__init__(self, m, p, tw, gauge_list)
+        self.populate_kinematic_variables()  # no use for ap2
+        self.root = '/Users/atlytle/Documents/IwasakiNPR/exceptional/'\
+                    '24x64/m{0}/gfmomprop_{1}_{0}_tw{2}'.format(
+                    str(m), pstring(p), mmap(tw))
+
+class IWf_Exceptional_Data(Data):
+    L, T = 32., 64.
+    V = (L**3)*T
+    a = 1/1.730  # 1/GeV
+    mres = .003152
+
+    def __init__(self, m, p, tw, gauge_list):
+        Data.__init__(self, m, p, tw, gauge_list)
+        self.populate_kinematic_variables()  # no use for ap2
+        self.root = '/Users/atlytle/Documents/IwasakiNPR/exceptional/'\
+                    '32x64/m{0}/gfmomprop_{1}_{0}_tw{2}'.format(
+                    str(m), pstring(p), mmap(tw))
+    
+    def load(self):
+        '''Overriding load() for exceptional data.'''
+        if not self.loaded:
+            self.prop_list = [np.load(self.prop_location(gf, "e"))
+                                for gf in self.gauge_list]
+            self.bilinear_array = [array([self.bilin_load(gf, gamma) 
+                                   for gamma in range(16)])
+                                   for gf in self.gauge_list]
+            self.fourquark_array = [array([self.fourquark_load(gf, gamma)
+                                    for gamma in range(16)])
+                                    for gf in self.gauge_list]
+            self.loaded = True
+        else:
+            pass
