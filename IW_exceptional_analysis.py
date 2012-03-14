@@ -19,6 +19,7 @@ def load_IWf_Data(m, plist, twlist, gflist):
 def calc_Zs(Data):
     Data.load()
     m.bilinear_Lambdas(Data)
+    m.fourquark_Zs(Data)
     return Data
 
 def main():
@@ -34,8 +35,13 @@ def main():
     pool.close()
     pool.join()
 
-    print [d.Lambda_V for d in data004]
-    print [d.Lambda_A for d in data004]
+    print "Lambda_V:", [d.Lambda_V for d in data004]
+    print "Lambda_A:", [d.Lambda_A for d in data004]
+    print "Fourquark Lambdas:"
+    for d in data004:
+        print d.Zinv
+
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())
