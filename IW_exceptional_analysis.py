@@ -19,6 +19,7 @@ def load_IWf_Data(m, plist, twlist, gflist):
 def calc_Zs(Data):
     Data.load()
     m.bilinear_Lambdas(Data)
+    m.bilinear_LambdaJK(Data)
     m.fourquark_Zs(Data)
     return Data
 
@@ -37,6 +38,7 @@ def main():
 
     print "Lambda_V:", [d.Lambda_V for d in data004]
     print "Lambda_A:", [d.Lambda_A for d in data004]
+    print "Lambda_VpA_sigmaJK:", [d.Lambda_VpA_sigmaJK for d in data004]
     print "Fourquark Lambdas:"
     for d in data004:
         print d.Zinv

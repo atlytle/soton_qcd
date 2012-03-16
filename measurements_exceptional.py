@@ -9,19 +9,29 @@ from measurements import JKsample, JKsigma, bootstrap_sample
 
 # Measurements
 
-def amputate_bilinears_e(prop_list, bilinear_array):
+def amputate_bilinears_e(prop_bilinear_tuples):
+    '''
+    Gauge-average and amputate bilinear correlation functions.
+
+    Acts on a list of tuples [(prop, [bl0, bl1,...,bl15]), ...]
+    corresponding to each gauge configuration.'''
+
+    prop_list, bilinear_array = zip(*prop_bilinear_tuples)  # Unzip.
+
     N = len(prop_list)
     assert N == len(prop_list) == len(bilinear_array)
     prop_inv = inv(sum(prop_list)/N)
     bilinears = sum(bilinear_array)/N
-    return [reduce(dot, [prop_inv, bilinears[g], prop_inv])
-            for g in range(16)]
+    return array([reduce(dot, [prop_inv, bilinears[g], prop_inv])
+                     for g in range(16)])
+
+gamma_trace = lambda g, a: trace(dot(dw.hc(g), a).real)
 
 def bilinear_Lambdas(Data):
-    amputated = amputate_bilinears_e(Data.prop_list, Data.bilinear_array)
+    data_tuples = zip(Data.prop_list, Data.bilinear_array)
     norm = Data.V/12
-    Lambda =lambda x, y: (trace(dot(dw.hc(x), y)).real)*norm
-    Data.Lambda = map(Lambda, Gc, amputated)
+    amputated = amputate_bilinears_e(data_tuples)
+    Data.Lambda = map(gamma_trace, Gc, amputated*norm)
 
     # For the (X, g) schemes.
     Data.Lambda_VpA = (Data.Lambda[1] + Data.Lambda[2] + Data.Lambda[4] +
@@ -33,7 +43,24 @@ def bilinear_Lambdas(Data):
                        Data.Lambda[7])*(1./4)
 
 def bilinear_LambdaJK(Data):
-    pass
+    data_tuples = zip(Data.prop_list, Data.bilinear_array)
+    norm = Data.V/12
+    amputatedJK = map(amputate_bilinears_e, JKsample(data_tuples))
+    Data.LambdaJK = [array(map(gamma_trace, Gc, amp*norm)) 
+                     for amp in amputatedJK]
+    Data.Lambda_sigmaJK = JKsigma(Data.LambdaJK, Data.Lambda)
+
+    # For the (X, g) schemes.
+    def VpA(Lambda):
+        return (Lambda[1] + Lambda[2] + Lambda[4] +
+                Lambda[8] + Lambda[14] + Lambda[13] +
+                Lambda[11] + Lambda[7])*(1./8)
+    Data.Lambda_VpA_JK = map(VpA, Data.LambdaJK)
+    Data.Lambda_VpA_sigmaJK = JKsigma(Data.Lambda_VpA_JK, Data.Lambda_VpA)
+
+def bilinear_LambdaBoot(Data, N):
+    data_tuples = zip(Data.prop_list, Data.bilinear_array)
+    bootstrap_sample(data_tuples, N)
 
 # Fourquark Stuff.
 def amp_KmK(prop, fourquark):
