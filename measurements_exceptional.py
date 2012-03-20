@@ -60,7 +60,11 @@ def bilinear_LambdaJK(Data):
 
 def bilinear_LambdaBoot(Data, N):
     data_tuples = zip(Data.prop_list, Data.bilinear_array)
-    bootstrap_sample(data_tuples, N)
+    norm = Data.V/12
+    amputatedBoot = map(amputate_bilinears_e, bootstrap_sample(data_tuples,50))
+    Data.LambdaBoot = [array(map(gamma_trace, Gc, amp*norm))
+                       for amp in amputatedBoot]
+    Data.Lambda_sigmaBoot = Bootsigma(Data.LambdaBoot, Data.Lambda)
 
 # Fourquark Stuff.
 def amp_KmK(prop, fourquark):
