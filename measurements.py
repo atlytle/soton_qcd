@@ -228,7 +228,7 @@ def fourquark_Zs(Data):
     norm = (Data.V)**3
     Data.fourquark_Zs = dict(gg=None, gq=None, qg=None, qq=None)
     # (g, Y) - schemes, deltaS = 2 basis
-    Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm#*chiral_mask
+    Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm*chiral_mask
     VpA = Data.Lambda_VpA  # Requires prior bilinear calculation.
     Vq = Data.Vq  # Requires prior bilinear calculation.
     Data.Zinv = dot(Data.fourquark_Lambda, inv(F_gg))
@@ -239,9 +239,9 @@ def fourquark_Zs(Data):
     # (q, Y) - schemes, deltaS = 2 basis
     aq, apSq = Data.aq, Data.apSq
     Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*\
-                                                norm#*chiral_mask[:3,:3]
+                                                norm*chiral_mask
     #Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
-    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))#*chiral_mask[:3,:3]
+    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))*chiral_mask
     Data.Z_tmpq = inv(Data.Zinv_q)
     Data.fourquark_Zs['qg'] = Data.Z_tmpq*(VpA)*(VpA)  # (q, g)
     Data.fourquark_Zs['qq'] = Data.Z_tmpq*(Vq)*(Vq)    # (q, q)
@@ -252,13 +252,13 @@ def fourquark_ZsJK(Data):
                                           JKsample(Data.fourquark_array))
     norm = (Data.V)**3
     # Lambdas.
-    Lambda = lambda amp: (fourquark_proj_g(amp).real)*norm#*chiral_mask
+    Lambda = lambda amp: (fourquark_proj_g(amp).real)*norm*chiral_mask
     Data.Lambda_JK = map(Lambda, amputatedJK)
     Data.Lambda_sigmaJK = JKsigma(Data.Lambda_JK, Data.fourquark_Lambda)
     
     aq, apSq = Data.aq, Data.apSq
     Lambda_q = lambda amp: (fourquark_proj_q(amp, aq, apSq).real)*\
-                                                        norm#*chiral_mask[:3,:3]
+                                                        norm*chiral_mask
     Data.Lambda_JK_q = map(Lambda_q, amputatedJK)
     Data.Lambda_sigmaJK_q = JKsigma(Data.Lambda_JK_q, Data.fourquark_Lambda_q)
 
