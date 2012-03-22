@@ -221,7 +221,8 @@ def print_results(data):
                 print d.Zinv_q
                 print "Lambda^{-1}:"
                 print d.Z_tmpq
-                #print d.step_scale[scheme]
+                print "ssf:"
+                print d.step_scale[scheme]
             except:
                 print "output error"
             try:
@@ -234,9 +235,9 @@ def print_results(data):
             print ''
 
 def main():
-    compute = False  # Compute ss-functions from raw data.
+    compute = True  # Compute ss-functions from raw data.
     dump = False     # Pickle results.
-    load = True    # Un-pickle pre-computed results.
+    load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
    
@@ -313,12 +314,16 @@ def main():
         data0f = map(fits.line_fit_Data, data004, data006, data008)
      
         # Step-scaling functions.
-        
+       
+        map(do_ss(data02[0]), data02)
+        map(do_ss(data01[0]), data01)
+        map(do_ss(data005[0]), data005)
+    
         # Should ss functions just be calculated on the fly? Little overhead.
-        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
-        #denomC = data0c[0]
-        #denomF = data0f[0]
+        #denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
+        #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        denomC = data0c[0]
+        denomF = data0f[0]
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
         map(do_ss(denomC), data0c)
@@ -396,6 +401,9 @@ def main():
     print_results([data02[1], data01[1], data005[1], data0c[1]])
     print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
     '''
+    print_results([data02[-1]])
+    print_results([data01[-1]])
+    print_results([data005[-1]])
     print_results([data0c[-1], data0f[-1]])
     #plots
     if plot:
