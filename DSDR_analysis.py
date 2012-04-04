@@ -140,7 +140,8 @@ def main():
         with open(DSDR_chiral, 'r') as f:
             data0 = pickle.load(f)
 
-    print_results([data0042[0], data001[0], data0[0]])
+    #print_results([data0042[0], data001[0], data0[0]])
+    print [d.mu for d in data0]
 
     if plot:
         plot_data([data0042, data001, data0], 'gg', 1, 1)
