@@ -74,10 +74,10 @@ def main():
     # Load data.
     with open(DSDR_chiral, 'r') as f:
         DSDR_chiral = pickle.load(f)
-    with open(IWf_chiral_15, 'r') as f:
-        IWf_chiral_15 = pickle.load(f)
-    with open(IWc_chiral_15, 'r') as f:
-        IWc_chiral_15 = pickle.load(f)
+#    with open(IWf_chiral_15, 'r') as f:
+#        IWf_chiral_15 = pickle.load(f)
+#    with open(IWc_chiral_15, 'r') as f:
+#        IWc_chiral_15 = pickle.load(f)
     with open(IWf_chiral_11, 'r') as f:
         IWf_chiral_11 = pickle.load(f)
     with open(IWc_chiral_11, 'r') as f:
@@ -90,12 +90,19 @@ def main():
     IWc_chiral = IWc_chiral_11
     IWf_chiral = IWf_chiral_11
     
-    for scheme in 'gg', 'gq', 'qg', 'qq':
+    for scheme in 'gg', 'qq':
         print '____({0}, {1}) - scheme____\n'.format(*scheme)
         Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
         dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss, dss = IW_analysis.continuum_matrix(IWc_chiral,
                                                IWf_chiral, scheme, -1) #was -2
+        # ss, and dss develop 'nans' from fits.line_fit(), because
+        # the uncertainties on the chirally forbidden elements
+        # have been set to zero, which causes a singularity.
+        # We fix this by hand, setting the elements back to zero.
+        ss[np.isnan(ss)]=0.
+        dss[np.isnan(dss)]=0.
+
         C = C_178(alpha_s3, scheme)
         print_results(C, new(ss), new2(dss), new(Z), new2(dZ), ZA, dZA)
 

@@ -95,7 +95,7 @@ def print_results(data):
 def main():
     
     compute = True  # Compute Zs from raw data.
-    dump = False    # Pickle results.
+    dump = True    # Pickle results.
     load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results. (not implemented)
     save = False    # Save plots. (not implemented)

@@ -103,9 +103,10 @@ def interpolation(data, scheme, O, P):
 
     x = [d.mu for d in data]
     y = [d.step_scale[scheme][O][P] for d in data]
+    #print y DEBUG
     s = [d.step_scale_sigma[scheme][O][P] for d in data]
     x_ = np.linspace(data[0].mu, data[-1].mu)
-    y_ = interp1d(x, y, kind='cubic')  # (x_)
+    y_ = interp1d(x, y, kind='linear')  # (x_)
     s_ = interp1d(x, s, kind='linear')  # (x_)
     
     return (x_, y_, s_, x, y, s)
@@ -236,7 +237,7 @@ def print_results(data):
 
 def main():
     compute = True  # Compute ss-functions from raw data.
-    dump = False     # Pickle results.
+    dump = True     # Pickle results.
     load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
@@ -320,10 +321,10 @@ def main():
         map(do_ss(data005[0]), data005)
     
         # Should ss functions just be calculated on the fly? Little overhead.
-        #denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
-        denomC = data0c[0]
-        denomF = data0f[0]
+        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
+        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        #denomC = data0c[0]
+        #denomF = data0f[0]
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
         map(do_ss(denomC), data0c)

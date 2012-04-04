@@ -63,10 +63,7 @@ def line_fit(data):
     Fits data in (x, y, sig) format to a straight line.
     Expressions used are from Numerical Recipes.
     '''
-    #result = Data(0.0, data[0].p, data[0].tw, None)
-    mres = .001853
     dl = data
-    #dl = [(d.m + mres, d.fourquark_Zs, d.fourquark_sigmaJK) for d in data]
     S = lambda dl: sum([1/(d[2]*d[2]) for d in dl])
     Sx = lambda dl: sum([d[0]/(d[2]*d[2]) for d in dl])
     Sy = lambda dl: sum([d[1]/(d[2]*d[2]) for d in dl])
@@ -81,19 +78,6 @@ def line_fit(data):
     Cov = lambda dl: -Sx(dl)/delta(dl)
     r = lambda dl: -Sx(dl)/np.sqrt(S(dl)*Sxx(dl))
     return a(dl), np.sqrt(sigAsq(dl))
-
-#    print S(dl)
-#    print Sx(dl)
-#    print Sy(dl)
-#    print Sxx(dl)
-#    print Sxy(dl)
-#    print ''
-#    print a(dl)
-#    print b(dl)
-#    print sigAsq(dl)
-#    print sigBsq(dl)
-#    print Cov(dl)
-#    print r(dl)
 
 def line_fit_Lambda(Data1, Data2):
     "Wanted to test extrapolation in Lambda instead of Z."
