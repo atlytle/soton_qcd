@@ -136,7 +136,7 @@ def continuum_extrap(datac, dataf, scheme, O, P):
     
     yc_, sc_, xc, yc, sc = interpolation(datac, scheme, O, P)[1:]
     yf_, sf_, xf, yf, sf = interpolation(dataf, scheme, O, P)[1:]
-    x_ = np.linspace(max(xc[0],xf[0]), min(xc[-1],xf[-1]))
+    x_ = np.linspace(max(xc[0],xf[0]), min(xc[-1],xf[-1]), 400)
     #print x_
     ac = datac[0].a
     af = dataf[0].a
@@ -237,7 +237,7 @@ def print_results(data):
 
 def main():
     compute = True  # Compute ss-functions from raw data.
-    dump = False     # Pickle results.
+    dump = True     # Pickle results.
     load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
@@ -306,10 +306,10 @@ def main():
         map(do_ss(data005[0]), data005)
     
         # Should ss functions just be calculated on the fly? Little overhead.
-        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
-        denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
+        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1499) #KLUDGE
+        #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
         #denomC = data0c[0]
-        #denomF = data0f[0]
+        denomF = data0f[0]
         # why not take chiral limit of step-scale functions??
         # would this not have less m dependence? A: need booststrap
         map(do_ss(denomC), data0c)

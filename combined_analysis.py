@@ -85,8 +85,9 @@ def main():
     
     ####
 
-    print 'Matching points 1.145 GeV, 3 GeV\n'
-    Z_DSDR =  DSDR_chiral[0] 
+    print 'Matching points 1.15 GeV, 3 GeV\n'
+    Z_DSDR =  IW_analysis.interpolate_Zs(DSDR_chiral[0], DSDR_chiral[1], 1.1499) 
+    # need interpolations here? No that happens in continuum matrix.
     IWc_chiral = IWc_chiral_11
     IWf_chiral = IWf_chiral_11
     
@@ -95,7 +96,7 @@ def main():
         Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
         dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss, dss = IW_analysis.continuum_matrix(IWc_chiral,
-                                               IWf_chiral, scheme, -1) #was -2
+                                               IWf_chiral, scheme, -7) 
         # ss, and dss develop 'nans' from fits.line_fit(), because
         # the uncertainties on the chirally forbidden elements
         # have been set to zero, which causes a singularity.
