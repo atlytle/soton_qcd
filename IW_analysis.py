@@ -306,7 +306,8 @@ def main():
         map(do_ss(data005[0]), data005)
     
         # Should ss functions just be calculated on the fly? Little overhead.
-        denomC = interpolate_Zs(data0c[0], data0c[1], 1.1499) #KLUDGE
+        denomC = interpolate_Zs(data0c[0], data0c[1], 1.17184)
+        #denomC = interpolate_Zs(data0c[0], data0c[1], 1.1499) #KLUDGE
         #denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
         #denomC = data0c[0]
         denomF = data0f[0]

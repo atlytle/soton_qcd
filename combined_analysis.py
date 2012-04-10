@@ -96,7 +96,7 @@ def main():
         Z = Z_DSDR.fourquark_Zs[scheme][:3,:3]
         dZ = Z_DSDR.fourquark_sigmaJK[scheme][:3,:3]
         ss, dss = IW_analysis.continuum_matrix(IWc_chiral,
-                                               IWf_chiral, scheme, -7) 
+                                               IWf_chiral, scheme, -19) 
         # ss, and dss develop 'nans' from fits.line_fit(), because
         # the uncertainties on the chirally forbidden elements
         # have been set to zero, which causes a singularity.
