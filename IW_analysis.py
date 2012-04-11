@@ -103,9 +103,10 @@ def interpolation(data, scheme, O, P):
 
     x = [d.mu for d in data]
     y = [d.step_scale[scheme][O][P] for d in data]
+    #print y DEBUG
     s = [d.step_scale_sigma[scheme][O][P] for d in data]
     x_ = np.linspace(data[0].mu, data[-1].mu)
-    y_ = interp1d(x, y, kind='cubic')  # (x_)
+    y_ = interp1d(x, y, kind='linear')  # (x_)
     s_ = interp1d(x, s, kind='linear')  # (x_)
     
     return (x_, y_, s_, x, y, s)
@@ -221,7 +222,8 @@ def print_results(data):
                 print d.Zinv_q
                 print "Lambda^{-1}:"
                 print d.Z_tmpq
-                #print d.step_scale[scheme]
+                print "ssf:"
+                print d.step_scale[scheme]
             except:
                 print "output error"
             try:
@@ -234,9 +236,9 @@ def print_results(data):
             print ''
 
 def main():
-    compute = False  # Compute ss-functions from raw data.
+    compute = True  # Compute ss-functions from raw data.
     dump = False     # Pickle results.
-    load = True    # Un-pickle pre-computed results.
+    load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
    
@@ -246,47 +248,32 @@ def main():
         # Fine IW.
         data004 = load_IWf_Data(.004, plistIWf_a, twlistIWf_a, gflist004_a) +\
                   load_IWf_Data(.004, plistIWf_b, twlistIWf_b, gflist004_b) +\
+                  load_IWf_Data(.004, [(-4,0,4,0)], [.375], gflist004) +\
                   load_IWf_Data(.004, plist3IWf, twlist3IWf, gflist004_3)
-        #tmp = load_IWf_Data(.004, plist3IWf, twlist3IWf,gflist004_3)[0]
-        #data004.insert(-1, tmp)
-        #del data004[-3]
 
         data006 = load_IWf_Data(.006, plistIWf_a, twlistIWf_a, gflist006_a) +\
                   load_IWf_Data(.006, plistIWf_b, twlistIWf_b, gflist006_b) +\
+                  load_IWf_Data(.006, [(-4,0,4,0)], [.375], gflist006) +\
                   load_IWf_Data(.006, plist3IWf, twlist3IWf, gflist006_3)
-        #tmp = load_IWf_Data(.006, plist3IWf, twlist3IWf,gflist006_3)[0]
-        #data006.insert(-1, tmp)
-        #del data006[-3]
-
 
         data008 = load_IWf_Data(.008, plistIWf_a, twlistIWf_a, gflist008_) +\
                   load_IWf_Data(.008, plistIWf_b, twlistIWf_b, gflist008_) +\
+                  load_IWf_Data(.008, [(-4,0,4,0)], [.375], gflist008) +\
                   load_IWf_Data(.008, plist3IWf, twlist3IWf, gflist008_3)
-        #tmp = load_IWf_Data(.008, plist3IWf, twlist3IWf,gflist008_3)[0]
-        #data008.insert(-1, tmp)
-        #del data008[-3]
-        print [d.mu for d in data008]
 
         # Coarse IW.
         data005 = load_IWc_Data(.005, plistIWc_, twlistIWc_, gflist005_) +\
+                  load_IWc_Data(.005, [(-3,0,3,0)], [2.25], gflist005) +\
                   load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)
-        #tmp = load_IWc_Data(.005, plist3IWc, twlist3IWc, gflist005_3)[0]
-        #data005.insert(-1, tmp)
-        #del data005[-1]
 
         data01 = load_IWc_Data(.01, plistIWc_, twlistIWc_, gflist01_) +\
+                 load_IWc_Data(.01, [(-3,0,3,0)], [2.25], gflist01) +\
                  load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)
-        #tmp = load_IWc_Data(.01, plist3IWc, twlist3IWc, gflist01_3)[0]
-        #data01.insert(-1, tmp)
-        #del data01[-1]
 
         data02 = load_IWc_Data(.02, plistIWc_, twlistIWc_, gflist02_) +\
+                 load_IWc_Data(.02, [(-3,0,3,0)], [2.25], gflist02) +\
                  load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)
-        #tmp = load_IWc_Data(.02, plist3IWc, twlist3IWc, gflist02_3)[0]
-        #data02.insert(-1, tmp)
-        #del data02[-1]
-        print [d.mu for d in data02] 
-        #del tmp
+        
         print "complete"
         
         print "Computing Zs...",
@@ -313,7 +300,11 @@ def main():
         data0f = map(fits.line_fit_Data, data004, data006, data008)
      
         # Step-scaling functions.
-        
+       
+        map(do_ss(data02[0]), data02)
+        map(do_ss(data01[0]), data01)
+        map(do_ss(data005[0]), data005)
+    
         # Should ss functions just be calculated on the fly? Little overhead.
         denomC = interpolate_Zs(data0c[0], data0c[1], 1.1452) #KLUDGE
         denomF = interpolate_Zs(data0f[0], data0f[1], 1.1452) #KLUDGE
@@ -396,7 +387,14 @@ def main():
     print_results([data02[1], data01[1], data005[1], data0c[1]])
     print_results([data02[-1], data01[-1], data005[-1], data0c[-1]])
     '''
+    '''
+    print_results([data02[-1]])
+    print_results([data01[-1]])
+    print_results([data005[-1]])
     print_results([data0c[-1], data0f[-1]])
+    '''
+    print [d.mu for d in data0c]
+    print [d.mu for d in data0f]
     #plots
     if plot:
         print "Plotting results...",

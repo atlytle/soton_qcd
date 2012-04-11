@@ -94,9 +94,9 @@ def print_results(data):
     
 def main():
     
-    compute = False  # Compute Zs from raw data.
-    dump = False    # Pickle results.
-    load = True    # Un-pickle pre-computed results.
+    compute = True  # Compute Zs from raw data.
+    dump = True    # Pickle results.
+    load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results. (not implemented)
     save = False    # Save plots. (not implemented)
 
@@ -140,9 +140,9 @@ def main():
         with open(DSDR_chiral, 'r') as f:
             data0 = pickle.load(f)
 
-    print data0[5].fourquark_Zs['gg'][3:,3:]
-    print ''
-    print data0[5].fourquark_Zs['qg'][3:,3:]
+    #print_results([data0042[0], data001[0], data0[0]])
+    print [d.mu for d in data0]
+
     if plot:
         plot_data([data0042, data001, data0], 'gg', 1, 1)
         plot_data([data0042, data001, data0], 'qg', 1, 1)
