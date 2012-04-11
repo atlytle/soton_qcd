@@ -53,7 +53,10 @@ def main():
         root = '/Users/atlytle/Dropbox/pycode/soton/pickle/IW_exceptional'
         with open(root+'/IWf_exceptional_004.pkl', 'w') as f:
             pickle.dump(data004, f)
-
+        with open(root+'/IWf_exceptional_006.pkl', 'w') as f:
+            pickle.dump(data006, f)
+        with open(root+'/IWf_exceptional_008.pkl', 'w') as f:
+            pickle.dump(data008, f)
     '''
     print "Lambda_V:", [d.Lambda_V for d in data004]
     print "Lambda_A:", [d.Lambda_A for d in data004]
