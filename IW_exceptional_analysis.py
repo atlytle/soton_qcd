@@ -1,11 +1,13 @@
 import sys
 import pickle
 import numpy as np
+ar = np.array
 from multiprocessing import Pool
 
+import fits
 import pyNPR as npr
 import measurements_exceptional as m
-from pole_fits import pole_subtract
+from pole_fits import pole_subtract,single_pole_fit
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -54,7 +56,7 @@ def main():
     root = '/Users/atlytle/Dropbox/pycode/soton/pickle/IW_exceptional'
     
     if compute and dump:
-        print "Pickling data...",
+        print "Pickling data..."
         with open(root+'/IWf_exceptional_004.pkl', 'w') as f:
             pickle.dump(data004, f)
         with open(root+'/IWf_exceptional_006.pkl', 'w') as f:
@@ -78,25 +80,60 @@ def main():
     for d in data004:
         print d.Zinv
     '''
+    print "Computing chiral limits..."
     # Naive chiral limit - we don't really want below, want to extrap on Lambdas...
         #data0f = map(fits.line_fit_Data, data004, data006, data008)
     # Naive pole subtraction - procedural stuff
-        # Extract Lambdas
+    # Extract Lambdas
     L004 = [d.Zinv for d in data004]
     L006 = [d.Zinv for d in data006]
     L008 = [d.Zinv for d in data008]
-        # Remove pole
-    Lsub1 = [pole_subtract(.004, d[0], .006, d[1]) 
+    m004 = data004[0].m + data004[0].mres
+    m006 = data006[0].m + data006[0].mres
+    m008 = data008[0].m + data008[0].mres
+    # Remove single pole
+    Lsub1 = [pole_subtract(m004, d[0], m006, d[1]) 
              for d in zip(L004, L006)]
-    print np.array(L004[0])
-    print ''
-    print np.array(L006[0])
-    print ''
-    print np.array(Lsub1[0])
-    Lsub2 = [pole_subtract(.006, d[0], .00, d[1]) 
+    if False:
+        print np.array(L004[0])
+        print ''
+        print np.array(L006[0])
+        print ''
+        print np.array(Lsub1[0])
+    
+    Lsub2 = [pole_subtract(m006, d[0], m008, d[1]) 
              for d in zip(L006, L008)]
-        # Chiral limit
-    # Less-naive chiral limit
+    # Chiral limit - first w/ no sigmas
+    m1 = m004 + m006
+    m2 = m006 + m008
+    print m1, m2
+    fit = fits.line_fit_2pt
+    chiral = [fit((m1, d[0]), (m2, d[1]))[1] for d in zip(Lsub1, Lsub2)]
+    if False:
+        print np.array(L008[-1])
+        print ''
+        print np.array(Lsub2[-1])
+        print '\n'
+        print np.array(L004[-1])
+        print ''
+    print np.array(Lsub1[-1])
+    print '\n'
+    print np.array(chiral[-1])
+    print ''
+    # Less-naive chiral limit - here try 3 parameter fits.
+    mlist = np.array([m004, m006, m008])
+    flat4 = [L.ravel() for L in L004]
+    flat6 = [L.ravel() for L in L006]
+    flat8 = [L.ravel() for L in L008]
+    i=0
+    result = [None]*len(flat4)
+    for m4, m6, m8 in zip(flat4, flat6, flat8):
+        result[i]=ar([single_pole_fit(mlist, ar([d4,d6,d8]), np.ones(3))[0]
+                      for d4,d6,d8 in zip(m4,m6,m8)]).reshape((5,5)) 
+        i+=1
+        
+    print '(ap)^2:', data004[-1].apSq    
+    print result[-1]
     # Plots.
     return 0
 
