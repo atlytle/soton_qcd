@@ -237,7 +237,7 @@ def print_results(data):
 
 def main():
     compute = True  # Compute ss-functions from raw data.
-    dump = True     # Pickle results.
+    dump = False     # Pickle results.
     load = False    # Un-pickle pre-computed results.
     plot = False     # Plot results.
     save = False    # Save plots.
@@ -396,6 +396,8 @@ def main():
     '''
     print [d.mu for d in data0c]
     print [d.mu for d in data0f]
+    print data0c[0].fourquark_Lambda
+    print data0c[0].fourquark_Zs['gg']
     #plots
     if plot:
         print "Plotting results...",
