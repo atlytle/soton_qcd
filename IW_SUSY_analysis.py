@@ -1,6 +1,7 @@
 import sys
 import pickle
 import itertools
+import optparse
 import numpy as np
 import pylab as p
 from scipy.interpolate import interp1d
@@ -154,16 +155,28 @@ def print_results(data):
             except:
                 print "output error"
             print ''
+            
+    
+def parse_args():
+    parser = optparse.OptionParser()
+    parser.add_option('-c', '--compute', action='store_true', dest='compute',
+                      help = 'Compute Zs from scratch.')
+    parser.add_option('-d', '--dump', action='store_true', dest='dump',
+                      help = 'Pickle results of the computation.')
+    parser.add_option('-l', '--load', action='store_true', dest='load',
+                      help = 'Load Zs from pickle directory.')
+    parser.add_option('-p', '--plot', action='store_true', dest='plot',
+                      help = 'Plot results.')
+    parser.add_option('-s', '--save', action='store_true', dest='save',
+                      help = 'Save the plots.')
+    options, args = parser.parse_args()
+    return options
 
 def main():
-    compute = False  # Compute Z-factors from raw data.
-    dump = False     # Pickle results.
-    load = True    # Un-pickle pre-computed results.
-    plot = True     # Plot results.
-    save = True    # Save plots.
+    options = parse_args()
    
     global data004, data006, data008, data005, data01, data02
-    if compute:
+    if options.compute:
         print "Initializing data structures...",
         # Fine IW.
         data004 = load_IWf_Data(.004, plistIWf_a, twlistIWf_a, gflist004_a) +\
@@ -233,7 +246,7 @@ def main():
         data0c = map(fits.line_fit_Data, data005, data01, data02)
         data0f = map(fits.line_fit_Data, data004, data006, data008)
    
-    if compute and dump:
+    if options.compute and options.dump:
         print "Pickling data...",    
         pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle/SUSY_BK'
         pickle_dict = \
@@ -248,7 +261,7 @@ def main():
         
         print "complete"
 
-    if load:
+    if options.load:
         print "Un-pickling data...",
         pickle_root = '/Users/atlytle/Dropbox/pycode/soton/pickle/SUSY_BK'
         with open(pickle_root+'/IWf_008_pickle', 'r') as f:
@@ -269,9 +282,20 @@ def main():
             data0f = pickle.load(f)
         
         print "complete."
+        
+        for d in data004[-4:]:
+            print '(ap)^2:', d.apSq
+            print 'mu^2:', d.mu*d.mu
+            print 'Lambda_A:', d.Lambda_A
+            print '  Lambda_V:', d.Lambda_V
+            print ''
+            
+            print 'Zs:'
+            print d.fourquark_Zs['gg'], '+/-\n', d.fourquark_sigmaJK['gg']
+            print '\n'
 
     # Plots.
-    if plot:
+    if options.plot:
         print "Plotting results...",
         coarse_legend = ('$am=.02$', '$am=.01$', '$am=.005$', '$am=-m_{res}$')
         fine_legend = ('$am=.008$', '$am=.006$', '$am=.004$', '$am=-m_{res}$')

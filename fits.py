@@ -11,6 +11,11 @@ def line_fit_2pt(p1, p2):
     m = (y2-y1)/(x2-x1)
     b = y1 - m*x1
     return m, b
+    
+def remove_nans(matrix):
+    areNans = np.isnan(matrix)
+    matrix[areNans] = 0.
+    return matrix
 
 def line_fit_2ptData(Data1, Data2):
     '''Chiral extrapolate fourquark Z-matrix on two Data points.'''
@@ -33,7 +38,8 @@ def line_fit_2ptData(Data1, Data2):
     return result
 
 def line_fit_Data(*Dat):
-    '''Chiral extrapolate fourquark Z-matrices.'''
+    '''Chiral extrapolate fourquark Z-matrices.
+    This version is being used for the non-exceptional schemes.'''
 
     for d in Dat:
         assert isinstance(d, Data)
@@ -57,6 +63,66 @@ def line_fit_Data(*Dat):
         result.fourquark_sigmaJK[s][areNans] = 0.
 
     return result
+    
+def line_fit_Data_e(*Dat):
+    '''Chiral extrapolate fourquark Z-matrices and Lambdas.
+    This version is being used for the exceptional scheme.'''
+
+    for d in Dat:
+        assert isinstance(d, Data)
+
+    # Initialize result.
+    d0 = Dat[0]
+    mres = d0.mres
+    result = d0.__class__(-mres, d0.p, d0.tw, None)
+    
+    # Extrapolate Lambdas.
+    points = [(d.m + mres, d.fourquark_Lambda, d.fourquark_Lambda_sigmaJK)
+              for d in Dat]
+    fit = line_fit2(points)
+    result.fourquark_Lambda, result.fourquark_Lambda_sigmaJK = fit.a, fit.sig_a
+      
+    # Extrapolate fourquark Zs.
+    points = [(d.m + mres, d.fourquark_Zs, d.fourquark_sigmaJK) 
+               for d in Dat]
+    fit = line_fit2(points)
+    result.fourquark_Zs, result.fourquark_sigmaJK = fit.a, fit.sig_a
+    result.Zfit = fit
+    
+    # Extrapolate fourquark Zinvs.
+    points = [(d.m + mres, d.Zinv, d.Zinv_sigmaJK) 
+               for d in Dat]
+    fit = line_fit2(points)
+    result.Zinv, result.Zinv_sigmaJK = fit.a, fit.sig_a
+    result.Zinvfit = fit
+        
+        # HACK to remove nans that occur from zeroing elements in data
+        #areNans = np.isnan(result.fourquark_Zs[s])
+        #result.fourquark_Zs[s][areNans] = 0.
+        #areNans = np.isnan(result.fourquark_sigmaJK[s])
+        #result.fourquark_sigmaJK[s][areNans] = 0.
+    
+    # Extrapolate subtracted Zinv if it is available.
+    try:
+        points = [(d.m + mres, d.Zinv_sub, d.Zinv_sub_sigma) for d in Dat]
+        fit = line_fit2(points)
+        result.Zinv_sub, result.Zinv_sub_sigma = fit.a, fit.sig_a
+        result.Zinv_subfit = fit
+    except AttributeError:
+        pass
+        
+    # Extrapolate subtracted Z if it is available
+    try:
+        points = [(d.m + mres, d.Zsub, d.Zsub_sigmaJK) for d in Dat]
+        fit = line_fit2(points)
+        result.Zsub, result.Zsub_sigmaJK = fit.a, fit.sig_a
+        result.Z_subfit = fit
+        result.Zsub = remove_nans(result.Zsub)
+        result.Zsub_sigmaJK = remove_nans(result.Zsub_sigmaJK)
+    except AttributeError:
+        pass
+        
+    return result
 
 def line_fit(data):
     '''
@@ -78,6 +144,40 @@ def line_fit(data):
     Cov = lambda dl: -Sx(dl)/delta(dl)
     r = lambda dl: -Sx(dl)/np.sqrt(S(dl)*Sxx(dl))
     return a(dl), np.sqrt(sigAsq(dl))
+    
+def line_fit2(data):
+    '''
+    Fits data in (x, y, sig) format to a straight line.
+    Expressions used are from Numerical Recipes.
+    
+    This form outputs a Result structure.  You should probably do away
+    with line_fit but you need to bring the rest of this file in line.
+    '''
+    dl = data
+    S = lambda dl: sum([1/(d[2]*d[2]) for d in dl])
+    Sx = lambda dl: sum([d[0]/(d[2]*d[2]) for d in dl])
+    Sy = lambda dl: sum([d[1]/(d[2]*d[2]) for d in dl])
+    Sxx = lambda dl: sum([d[0]*d[0]/(d[2]*d[2]) for d in dl])
+    Sxy = lambda dl: sum([d[0]*d[1]/(d[2]*d[2]) for d in dl])
+    delta = lambda dl: S(dl)*Sxx(dl) - Sx(dl)*Sx(dl)
+
+    a = lambda dl: (Sxx(dl)*Sy(dl) - Sx(dl)*Sxy(dl))/delta(dl)
+    b = lambda dl: (S(dl)*Sxy(dl) - Sx(dl)*Sy(dl))/delta(dl)
+    sigAsq = lambda dl: Sxx(dl)/delta(dl)
+    sigBsq = lambda dl: S(dl)/delta(dl)
+    Cov = lambda dl: -Sx(dl)/delta(dl)
+    r = lambda dl: -Sx(dl)/np.sqrt(S(dl)*Sxx(dl))
+    
+    class Result:
+        def __init__(self, dl):
+            self.N = len(dl)
+            self.a = a(dl)
+            self.sig_a = np.sqrt(sigAsq(dl))
+            self.b = b(dl)
+            self.chisq = sum([((d[1]-(self.a + self.b*d[0]))/d[2])**2 
+                              for d in dl])
+            self.chisq_dof = self.chisq/(self.N-2)      
+    return Result(dl)
 
 def line_fit_Lambda(Data1, Data2):
     "Wanted to test extrapolation in Lambda instead of Z."
@@ -92,7 +192,22 @@ def line_fit_Lambda(Data1, Data2):
     result.fourquark_Zs = np.dot(F_gg, np.linalg.inv(result.fourquark_Lambda))
     result.fourquark_sigmaJK = np.zeros((5,5))
     return result
-
+    
+def line_fit_bilinear_Lambdas(Data1, Data2):
+    "Using in DSDR_bilinear_analysis.py."
+    mres = Data1.mres
+    result = Data1.__class__(-mres, Data1.p, Data1.tw, None)
+    
+    p1 = (Data1.m + mres, Data1.Lambda_VmA, Data1.Lambda_VmA_sigmaJK)
+    p2 = (Data2.m + mres, Data2.Lambda_VmA, Data2.Lambda_VmA_sigmaJK)
+    result.Lambda_VmA, result.Lambda_VmA_sigmaJK = line_fit([p1, p2])
+    
+    p1 = (Data1.m + mres, Data1.Lambda_PmS, Data1.Lambda_PmS_sigmaJK)
+    p2 = (Data2.m + mres, Data2.Lambda_PmS, Data2.Lambda_PmS_sigmaJK)
+    result.Lambda_PmS, result.Lambda_PmS_sigmaJK = line_fit([p1, p2])
+    
+    return result
+    
 def spline_interpolate(Data_list):
    pass 
 

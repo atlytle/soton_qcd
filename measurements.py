@@ -54,9 +54,18 @@ def bilinear_Lambdas(Data):
     Data.Lambda = map(Lambda, Gc, amputated)
 
     # For the (X, g) schemes.
+    Data.Lambda_V = (Data.Lambda[1] + Data.Lambda[2] + Data.Lambda[4] +
+                     Data.Lambda[8])*(1./4)   
+    Data.Lambda_A = (Data.Lambda[14] + Data.Lambda[13] + Data.Lambda[11] +
+                     Data.Lambda[7])*(1./4)
     Data.Lambda_VpA = (Data.Lambda[1] + Data.Lambda[2] + Data.Lambda[4] +
                        Data.Lambda[8] + Data.Lambda[14] + Data.Lambda[13] +
                        Data.Lambda[11] + Data.Lambda[7])*(1./8)
+    Data.Lambda_VmA = 2*(Data.Lambda_V - Data.Lambda_A)/\
+                        (Data.Lambda_V + Data.Lambda_A)
+    #Data.Lambda_VmA = (Data.Lambda_V - Data.Lambda_A)
+    Data.Lambda_PmS = 2*(Data.Lambda[15] - Data.Lambda[0])/\
+                        (Data.Lambda[15] + Data.Lambda[0])
     # For the (X, q) schemes.
     aq = Data.aq
     Gmu = (amputated[1], amputated[2], amputated[4], amputated[8])
@@ -75,13 +84,34 @@ def bilinear_LambdaJK(Data):
     norm = Data.V/12.
     Lambda = lambda x, y: (trace(dot(dw.hc(x), y)).real)*norm
     Data.LambdaJK = [np.array(map(Lambda, Gc, amp)) for amp in amputatedJK]
+    Data.Lambda_sigmaJK = JKsigma(Data.LambdaJK, Data.Lambda)
+    
     # For the (X, g) schemes.
+    def V(Lambda):
+        return (Lambda[1] + Lambda[2] + Lambda[4] + Lambda[8])*(1/4.)
+    def A(Lambda):
+        return (Lambda[14] + Lambda[13] + Lambda[11] + Lambda[7])*(1/4.)
     def VpA(Lambda):
         return (Lambda[1] + Lambda[2] + Lambda[4] +
                 Lambda[8] + Lambda[14] + Lambda[13] +
                 Lambda[11] + Lambda[7])*(1./8)
+    def VmA(Lambda):
+        return 2*(V(Lambda) - A(Lambda))/(V(Lambda) + A(Lambda))
+    def PmS(Lambda):
+        return 2*(Lambda[15] - Lambda[0])/(Lambda[15] + Lambda[0])
+        
     Data.Lambda_VpA_JK = map(VpA, Data.LambdaJK)
-    Data.Lambda_sigmaJK = JKsigma(Data.LambdaJK, Data.Lambda)
+    Data.Lambda_VpA_sigmaJK = JKsigma(Data.Lambda_VpA_JK, Data.Lambda_VpA)
+    Data.Lambda_V_JK = map(V, Data.LambdaJK)
+    Data.Lambda_V_sigmaJK = JKsigma(Data.Lambda_V_JK, Data.Lambda_V)
+    Data.Lambda_A_JK = map(A, Data.LambdaJK)
+    Data.Lambda_A_sigmaJK = JKsigma(Data.Lambda_A_JK, Data.Lambda_A)
+    Data.Lambda_V_sigmaJK = JKsigma(Data.Lambda_V_JK, Data.Lambda_V)
+    Data.Lambda_VmA_JK = map(VmA, Data.LambdaJK)
+    Data.Lambda_VmA_sigmaJK = JKsigma(Data.Lambda_VmA_JK, Data.Lambda_VmA)
+    Data.Lambda_PmS_JK = map(PmS, Data.LambdaJK)
+    Data.Lambda_PmS_sigmaJK = JKsigma(Data.Lambda_PmS_JK, Data.Lambda_PmS)
+    
     # For the (X, q) schemes.
     aq = Data.aq
     apSq = Data.apSq

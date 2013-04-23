@@ -89,11 +89,72 @@ from measurements import G_VVpAA, G_VVmAA, G_SSmPP, G_SSpPP, G_TT
 from measurements import proj_g, fourquark_proj_g, F_gg
 
 def fourquark_Zs(Data):
-    "Z-factors corresponding to fourquark operators in (X,Y)-schemes."
+    "Z-factors corresponding to fourquark operators."
 
     amputated = amputate_fourquark(Data.prop_list, Data.fourquark_array)
     norm = (Data.V)**3
     VpA = Data.Lambda_VpA
     Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm
     Data.Zinv = dot(Data.fourquark_Lambda, inv(F_gg))/(VpA)**2
+    Data.fourquark_Zs = inv(Data.Zinv)
+    
+def fourquark_ZsJK(Data):
+    "Jack-knife samples and uncertainties for fourquark Zs."
+    
+    amputatedJK = map(amputate_fourquark, JKsample(Data.prop_list), 
+                                          JKsample(Data.fourquark_array))
+    norm = (Data.V)**3
+    Lambda = lambda amp: (fourquark_proj_g(amp).real)*norm
+    Data.fourquark_Lambda_JK = map(Lambda, amputatedJK)
+    Data.fourquark_Lambda_sigmaJK = JKsigma(Data.fourquark_Lambda_JK,
+                                            Data.fourquark_Lambda)
+    Zinv = lambda Lambda, VpA: dot(Lambda, inv(F_gg))/(VpA)**2
+    Data.Zinv_JK = map(Zinv, Data.fourquark_Lambda_JK, Data.Lambda_VpA_JK)
+    Data.Zinv_sigmaJK = JKsigma(Data.Zinv_JK, Data.Zinv)
+    Zs = lambda Lambda, VpA: dot(F_gg, inv(Lambda))*VpA*VpA
+    Data.fourquark_ZsJK = map(Zs, Data.fourquark_Lambda_JK, Data.Lambda_VpA_JK)
+    Data.fourquark_sigmaJK = JKsigma(Data.fourquark_ZsJK, Data.fourquark_Zs)
+    
+def Zsub(Data):
+    "This gives results for Z assuming we have Zinv and Zinv_sub."
+    def invert(Zinv, Zinv_sub):
+        Zinv_comb = np.zeros((5,5))
+        Zinv_comb[0,0] = Zinv[0,0]
+        Zinv_comb[1:3,1] = Zinv[1:3,1]
+        Zinv_comb[1:3,2] = Zinv_sub[1:3,2] 
+        Zinv_comb[3:5,3] = Zinv_sub[3:5,3]
+        Zinv_comb[3:5,4] = Zinv[3:5,4]
+        
+        return inv(Zinv_comb)
+        
+    Data.Zsub = invert(Data.Zinv, Data.Zinv_sub)
+    Data.Zsub_JK = map(invert, Data.Zinv_JKexpand, Data.Zinv_subJK)
+    Data.Zsub_sigmaJK = JKsigma(Data.Zsub_JK, Data.Zsub)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 

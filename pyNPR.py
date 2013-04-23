@@ -185,7 +185,7 @@ class DSDR_Data(Data):
 class IWf_Data(Data):
     L, T = 32., 64.
     V = (L**3)*T
-    a = 1/2.309  # 1/GeV
+    a = 1/2.310  # 1/GeV, from DSDR Table XII.
     mres = .0006664
 
     def __init__(self, m, p, tw, gauge_list):
@@ -198,7 +198,7 @@ class IWf_Data(Data):
 class IWc_Data(Data):
     L, T = 24., 64.
     V = (L**3)*T
-    a = 1/1.746  # 1/GeV
+    a = 1/1.747  # 1/GeV, from DSDR Table XII.
     mres = .003152
 
     def __init__(self, m, p, tw, gauge_list):
@@ -211,8 +211,8 @@ class IWc_Data(Data):
 class IWc_Exceptional_Data(Data):
     L, T = 24., 64.
     V = (L**3)*T
-    a = 1/1.730  # 1/GeV
-    mres = .003152
+    a = 1/1.747   # 1/GeV, from DSDR Table XII.
+    mres = .003152 # (43)
 
     def __init__(self, m, p, tw, gauge_list):
         Data.__init__(self, m, p, tw, gauge_list)
@@ -220,12 +220,34 @@ class IWc_Exceptional_Data(Data):
         self.root = '/Users/atlytle/Documents/IwasakiNPR/exceptional/'\
                     '24x64/m{0}/gfmomprop_{1}_{0}_tw{2}'.format(
                     str(m), pstring(p), mmap(tw))
+                    
+    def load(self):
+        '''Overriding load() for exceptional data.'''
+        if not self.loaded:
+            self.prop_list = [np.load(self.prop_location(gf, "e"))
+                                for gf in self.gauge_list]
+            self.bilinear_array = [array([self.bilin_load(gf, gamma) 
+                                   for gamma in range(16)])
+                                   for gf in self.gauge_list]
+            self.fourquark_array = [array([self.fourquark_load(gf, gamma)
+                                    for gamma in range(16)])
+                                    for gf in self.gauge_list]
+            self.loaded = True
+        else:
+            pass
+            
+    def clear(self):
+        '''Delete references to memory intensive data structures.'''
+        del self.prop_list
+        del self.bilinear_array
+        del self.fourquark_array
+        self.loaded = False
 
 class IWf_Exceptional_Data(Data):
     L, T = 32., 64.
     V = (L**3)*T
-    a = 1/1.730  # 1/GeV
-    mres = .003152
+    a = 1/2.310  # 1/GeV, from DSDR Table XII.
+    mres = .0006664 # (76)
 
     def __init__(self, m, p, tw, gauge_list):
         Data.__init__(self, m, p, tw, gauge_list)
@@ -248,3 +270,10 @@ class IWf_Exceptional_Data(Data):
             self.loaded = True
         else:
             pass
+            
+    def clear(self):
+        '''Delete references to memory intensive data structures.'''
+        del self.prop_list
+        del self.bilinear_array
+        del self.fourquark_array
+        self.loaded = False
