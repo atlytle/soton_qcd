@@ -172,7 +172,7 @@ class Spectator_Data(Data):
 class DSDR_Data(Data):
     L, T = 32., 64.
     V = (L**3)*T
-    a = 1/1.36365  # 1/GeV
+    a = 1/1.355 #1/1.36365  # 1/GeV
     mres = .0018347
 
     def __init__(self, m, p, tw, gauge_list):
