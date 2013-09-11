@@ -213,6 +213,7 @@ class IWc_Exceptional_Data(Data):
     V = (L**3)*T
     a = 1/1.747   # 1/GeV, from DSDR Table XII.
     mres = .003152 # (43)
+    ZA = 0.71689  # (51) from Table VIII Continuum limit paper.
 
     def __init__(self, m, p, tw, gauge_list):
         Data.__init__(self, m, p, tw, gauge_list)
@@ -248,6 +249,7 @@ class IWf_Exceptional_Data(Data):
     V = (L**3)*T
     a = 1/2.310  # 1/GeV, from DSDR Table XII.
     mres = .0006664 # (76)
+    ZA = 0.74469  # (13) from Table XVIII continuum limit paper.
 
     def __init__(self, m, p, tw, gauge_list):
         Data.__init__(self, m, p, tw, gauge_list)

@@ -293,6 +293,10 @@ def main():
             print 'Zs:'
             print d.fourquark_Zs['gg'], '+/-\n', d.fourquark_sigmaJK['gg']
             print '\n'
+            
+        for d in data008[-3], data006[-3], data004[-3]:
+            print '(ap)^2:', d.apSq
+            print 'mu^2:', d.mu*d.mu
 
     # Plots.
     if options.plot:

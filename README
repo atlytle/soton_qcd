@@ -30,4 +30,14 @@ combined_analysis.py -
 ---- Jan 10, 2012 ----
 
 IW_SUSY_analysis.py -
-    5x5 Delta S=2 analysis for SUSY B_K project.
+    5x5 Delta S=2 analysis for SUSY B_K project. Non-exceptional schemes.
+
+IW_exceptional_analysis_24cube.py -
+    5x5 Delta S=2 analysis on coarse IW lattices. Exceptional schemes.
+
+IW_exceptional_analysis_32cube.py -
+    5x5 Delta S=2 analysis on fine IW lattices. Exceptional schemes.
+
+IW_NE_printout.py -
+    Results printout for 5x5 NE analysis.
+
