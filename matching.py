@@ -5,6 +5,7 @@ alpha_s2 = 0.296008  # 2 GeV
 alpha_s3 = 0.245442  # 3 GeV
 
 xi = 0  # Gauge-fixing parameter.
+CF = 4./3  # Casimir op, fundamental SU(3).
 
 # From B_K paper & Christoph's note.
 R_BK = {'gg': 0.2118 + 0.734*xi,
@@ -39,3 +40,12 @@ def C_178(alpha_s, scheme):
     tmp[0,0] = C_BK(alpha_s, scheme)
     tmp[1:3,1:3] = C_78(alpha_s, scheme)
     return tmp
+
+# Non-exceptional matching factors for Zm. arXiv: 0901.2599
+
+def Cm(alpha_s, scheme):
+    '''Non-exceptional matching factors for Zm. arXiv: 0901.2599'''
+
+    R = {'q': 0.4841391,  # SMOM from Table 2. 
+         'g': 1.4841391}  # SMOM_{\gamma_\mu} from (53)
+    return 1 - (alpha_s/(4*pi))*CF*R[scheme]

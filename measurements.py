@@ -76,6 +76,15 @@ def bilinear_Lambdas(Data):
     tmp = reduce(dot, [qmuGmu5, Gc[15], dw.slash(aq)]).real
     Data.Vq5 = trace(tmp*norm)/Data.apSq
     Data.Vq = (Data.Vq + Data.Vq5)/2 #fix
+    
+    # Z-factors.
+    def Z_S(Lambda, Lambda_vec):
+        'Lambda_vec depends on how Zq is determined (see usage below).'
+        return Lambda_vec/Lambda[0]
+        
+    Data.Z_S = dict(g=None, q=None)
+    Data.Z_S['g'] = Z_S(Data.Lambda[0], Data.Lambda_VpA)
+    Data.Z_S['q'] = Z_S(Data.Lambda[0], Data.Vq)
 
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),
@@ -126,7 +135,19 @@ def bilinear_LambdaJK(Data):
         return trace(tmp*norm)/Data.apSq
     Data.Vq_JK = [(Vq(amp)+Vq5(amp))/2 for amp in amputatedJK]
     Data.Vq_sigmaJK = JKsigma(Data.Vq_JK, Data.Vq)
- 
+    
+    # Z-factors.
+    def Z_S(Lambda, Lambda_vec):
+        'Lambda_vec depends on how Zq is determined (see usage below).'
+        return Lambda_vec/Lambda[0]
+        
+    Data.Z_S = dict(g=None, q=None)
+    Data.Z_S_JK['g'] = map(Z_S, Data.LambdaJK, Data.Lambda_VpA_JK)
+    Data.Z_S_JK['q'] = map(Z_S, Data.LambdaJK, Data.Lambda_Vq_JK)
+    for scheme in 'g', 'q':
+        Data.Z_S_sigmaJK[scheme] = JKsigma(Data.Z_S_JK[scheme], Data.Z_S[scheme])
+    
+    
 def bilinear_LambdaBoot(Data):
     pass
 

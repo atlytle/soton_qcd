@@ -264,6 +264,17 @@ def line_fit_bilinear_Lambdas(Data1, Data2):
     
     return result
     
+def line_fit_bilinears(*Dat):
+    "Using in e.g. IW_bilinear_analysis.py"
+    for d in Dat:
+        assert isinstance(d, Data)
+
+    # Initialize result.
+    d0 = Dat[0]
+    mres = d0.mres
+    result = d0.__class__(-mres, d0.p, d0.tw, None)
+    
+    
 def spline_interpolate(Data_list):
    pass 
 
