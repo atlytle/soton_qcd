@@ -49,3 +49,10 @@ def Cm(alpha_s, scheme):
     R = {'q': 0.4841391,  # SMOM from Table 2. 
          'g': 1.4841391}  # SMOM_{\gamma_\mu} from (53)
     return 1 - (alpha_s/(4*pi))*CF*R[scheme]
+
+def C_S(alpha_s, scheme):
+    '''Non-exceptional matching factors for Z_S. arXiv: 0901.2599'''
+
+    R = {'q': 0.4841391,  # SMOM from Table 2. 
+         'g': 1.4841391}  # SMOM_{\gamma_\mu} from (53)
+    return 1 + (alpha_s/(4*pi))*CF*R[scheme]
