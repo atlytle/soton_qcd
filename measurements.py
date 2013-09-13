@@ -83,8 +83,8 @@ def bilinear_Lambdas(Data):
         return Lambda_vec/Lambda[0]
         
     Data.Z_S = dict(g=None, q=None)
-    Data.Z_S['g'] = Z_S(Data.Lambda[0], Data.Lambda_VpA)
-    Data.Z_S['q'] = Z_S(Data.Lambda[0], Data.Vq)
+    Data.Z_S['g'] = Z_S(Data.Lambda, Data.Lambda_VpA)
+    Data.Z_S['q'] = Z_S(Data.Lambda, Data.Vq)
 
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),
@@ -141,9 +141,10 @@ def bilinear_LambdaJK(Data):
         'Lambda_vec depends on how Zq is determined (see usage below).'
         return Lambda_vec/Lambda[0]
         
-    Data.Z_S = dict(g=None, q=None)
+    Data.Z_S_JK = dict(g=None, q=None)
+    Data.Z_S_sigmaJK = dict(g=None, q=None)
     Data.Z_S_JK['g'] = map(Z_S, Data.LambdaJK, Data.Lambda_VpA_JK)
-    Data.Z_S_JK['q'] = map(Z_S, Data.LambdaJK, Data.Lambda_Vq_JK)
+    Data.Z_S_JK['q'] = map(Z_S, Data.LambdaJK, Data.Vq_JK)
     for scheme in 'g', 'q':
         Data.Z_S_sigmaJK[scheme] = JKsigma(Data.Z_S_JK[scheme], Data.Z_S[scheme])
     

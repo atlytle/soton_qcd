@@ -274,6 +274,16 @@ def line_fit_bilinears(*Dat):
     mres = d0.mres
     result = d0.__class__(-mres, d0.p, d0.tw, None)
     
+    # Chiral extrap of Z_S.
+    result.Z_S = dict(g=None, q=None)
+    result.Z_S_sigmaJK = dict(g=None, q=None)
+    result.Z_S_fit = dict(g=None, q=None)
+    for scheme in 'g', 'q':
+        points = [(d.m + mres, d.Z_S[scheme], d.Z_S_sigmaJK[scheme]) for d in Dat]
+        fit = line_fit2(points)
+        result.Z_S[scheme], result.Z_S_sigmaJK[scheme] = fit.a, fit.sig_a
+        result.Z_S_fit = fit
+    return result
     
 def spline_interpolate(Data_list):
    pass 
