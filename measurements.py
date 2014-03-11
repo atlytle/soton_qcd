@@ -34,6 +34,18 @@ def bootstrap_sample(data, N):
 
 
 # Measurements
+def prop_trace(prop_list, aq, sin=True):
+    "Trace of qslash*inv(prop)*(1/12q^2). Supports two forms of q."
+    N = len(prop_list)
+    prop_inv = inv(sum(prop_list)/N)
+    qslash = dw.slash(aq)
+    qslash_sin = dw.slash(np.sin(aq))
+    qsquared = dw.inner(aq)
+    qsquared_sin = dw.inner(np.sin(aq))
+    if sin:
+        return (1./12)*trace(dot(qslash_sin, prop_inv)/qsquared_sin)
+    else:
+        return (1./12)*trace(dot(qslash, prop_inv)/qsquared)
 
 def amputate_bilinears(inprop_list, outprop_list, bilinear_array):
     N = len(inprop_list)
