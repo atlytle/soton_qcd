@@ -43,9 +43,9 @@ def prop_trace(prop_list, aq, sin=True):
     qsquared = dw.inner(aq)
     qsquared_sin = dw.inner(np.sin(aq))
     if sin:
-        return (1./12)*trace(dot(qslash_sin, prop_inv)/qsquared_sin)
+        return (1./12)*trace(dot(qslash_sin, prop_inv)).imag/qsquared_sin
     else:
-        return (1./12)*trace(dot(qslash, prop_inv)/qsquared)
+        return (1./12)*trace(dot(qslash, prop_inv)).imag/qsquared
 
 def amputate_bilinears(inprop_list, outprop_list, bilinear_array):
     N = len(inprop_list)
@@ -61,6 +61,15 @@ def bilinear_Lambdas(Data):
     amputated = amputate_bilinears(Data.inprop_list,
                                     Data.outprop_list,
                                     Data.bilinear_array)
+                                    
+    # Include Tr[qslash*inv(prop)]
+    # Are you matching momenta to the prop correctly?
+    Data.prop_trace_in = prop_trace(Data.inprop_list, Data.ap, sin=True)*Data.V
+    #Data.prop_trace_out = prop_trace(Data.outprop_list, Data.ap2, sin=True)*Data.V
+    Data.prop_trace_in2 = prop_trace(Data.inprop_list, Data.ap, sin=False)*Data.V
+    #Data.prop_trace_out2 = prop_trace(Data.outprop_list, Data.ap2, sin=False)*Data.V
+
+    
     norm = Data.V/12.
     Lambda = lambda x, y: (trace(dot(dw.hc(x), y)).real)*norm
     Data.Lambda = map(Lambda, Gc, amputated)
