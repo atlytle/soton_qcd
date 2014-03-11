@@ -76,9 +76,13 @@ def line_fit_Data(*Dat):
     mres = d0.mres
     result = d0.__class__(-mres, d0.p, d0.tw, None)
 
-    # Chiral extrap of Z^{-1}.
+    # Chiral extrap of Z^{-1}. (g,g)
     points = [(d.m + mres, d.Zinv, d.Zinv_sigmaJK) for d in Dat]
     result.Zinv, result.Zinv_sigmaJK = line_fit(points)
+    
+    # Chiral extrap of Z^{-1}. (q,q)    
+    points = [(d.m + mres, d.Zinv_q, d.Zinv_q_sigmaJK) for d in Dat]
+    result.Zinv_q, result.Zinv_q_sigmaJK = line_fit(points)
     
     # Chiral extrap of Z^chi Lambda^f
     points = [(d.m + mres, d.thing, d.thing_sigmaJK) for d in Dat]
@@ -98,11 +102,11 @@ def line_fit_Data(*Dat):
     result.thing = dot(result.Z_chi, result.Zinv)
     
     # Chiral extrap of Lambda_q.
-    result.fourquark_Lambda_q = {}
-    points = [(d.m + mres, d.fourquark_Lambda_q, d.Lambda_sigmaJK_q)
-              for d in Dat]
-    result.fourquark_Lambda_q, result.Lambda_sigmaJK_q = line_fit(points)
-    result.Zinv_q = dot(result.fourquark_Lambda_q, inv(F_qq))
+#    result.fourquark_Lambda_q = {}
+#    points = [(d.m + mres, d.fourquark_Lambda_q, d.Lambda_sigmaJK_q)
+#              for d in Dat]
+#    result.fourquark_Lambda_q, result.Lambda_sigmaJK_q = line_fit(points)
+#    result.Zinv_q = dot(result.fourquark_Lambda_q, inv(F_qq))
      
     # Chiral extrap of Zs.    
     result.fourquark_Zs = {} #argument for putting these in class def?

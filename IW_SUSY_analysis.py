@@ -179,19 +179,19 @@ def main():
     if options.compute:
         print "Initializing data structures...",
         # Fine IW.
-        data004 = load_IWf_Data(.004, plistIWf_a, twlistIWf_a, gflist004_a) +\
-                  load_IWf_Data(.004, plistIWf_b, twlistIWf_b, gflist004_b) +\
-                  load_IWf_Data(.004, plistIWf_c, twlistIWf_c, gflist004_c) +\
+        data004 = load_IWf_Data(.004, plistIWf_a[2:], twlistIWf_a[2:], gflist004_a) +\
+                  load_IWf_Data(.004, plistIWf_b[0:0], twlistIWf_b[0:0], gflist004_b) +\
+                  load_IWf_Data(.004, plistIWf_c[0:0], twlistIWf_c[0:0], gflist004_c) +\
                   load_IWf_Data(.004, plistIWf_d, twlistIWf_d, gflist004_d)
 
-        data006 = load_IWf_Data(.006, plistIWf_a, twlistIWf_a, gflist006_a) +\
-                  load_IWf_Data(.006, plistIWf_b, twlistIWf_b, gflist006_b) +\
-                  load_IWf_Data(.006, plistIWf_c, twlistIWf_c, gflist006_c) +\
+        data006 = load_IWf_Data(.006, plistIWf_a[2:], twlistIWf_a[2:], gflist006_a) +\
+                  load_IWf_Data(.006, plistIWf_b[0:0], twlistIWf_b[0:0], gflist006_b) +\
+                  load_IWf_Data(.006, plistIWf_c[0:0], twlistIWf_c[0:0], gflist006_c) +\
                   load_IWf_Data(.006, plistIWf_d, twlistIWf_d, gflist006_d)
 
-        data008 = load_IWf_Data(.008, plistIWf_a, twlistIWf_a, gflist008_a) +\
-                  load_IWf_Data(.008, plistIWf_b, twlistIWf_b, gflist008_b) +\
-                  load_IWf_Data(.008, plistIWf_c, twlistIWf_c, gflist008_c) +\
+        data008 = load_IWf_Data(.008, plistIWf_a[2:], twlistIWf_a[2:], gflist008_a) +\
+                  load_IWf_Data(.008, plistIWf_b[0:0], twlistIWf_b[0:0], gflist008_b) +\
+                  load_IWf_Data(.008, plistIWf_c[0:0], twlistIWf_c[0:0], gflist008_c) +\
                   load_IWf_Data(.008, plistIWf_d, twlistIWf_d, gflist008_d)
 
         
@@ -202,16 +202,16 @@ def main():
         print [d.mu for d in data008]
 
         # Coarse IW.
-        data005 = load_IWc_Data(.005, plistIWc_a, twlistIWc_a, gflist005_a) +\
-                  load_IWc_Data(.005, plistIWc_b, twlistIWc_b, gflist005_b) +\
+        data005 = load_IWc_Data(.005, plistIWc_a[12:], twlistIWc_a[12:], gflist005_a) +\
+                  load_IWc_Data(.005, plistIWc_b[0:0], twlistIWc_b[0:0], gflist005_b) +\
                   load_IWc_Data(.005, plistIWc_c, twlistIWc_c, gflist005_c)
 
-        data01 = load_IWc_Data(.01, plistIWc_a, twlistIWc_a, gflist01_a) +\
-                 load_IWc_Data(.01, plistIWc_b, twlistIWc_b, gflist01_b) +\
+        data01 = load_IWc_Data(.01, plistIWc_a[12:], twlistIWc_a[12:], gflist01_a) +\
+                 load_IWc_Data(.01, plistIWc_b[0:0], twlistIWc_b[0:0], gflist01_b) +\
                  load_IWc_Data(.01, plistIWc_c, twlistIWc_c, gflist01_c)
 
-        data02 = load_IWc_Data(.02, plistIWc_a, twlistIWc_a, gflist02_a) +\
-                 load_IWc_Data(.02, plistIWc_b, twlistIWc_b, gflist02_b) +\
+        data02 = load_IWc_Data(.02, plistIWc_a[12:], twlistIWc_a[12:], gflist02_a) +\
+                 load_IWc_Data(.02, plistIWc_b[0:0], twlistIWc_b[0:0], gflist02_b) +\
                  load_IWc_Data(.02, plistIWc_c, twlistIWc_c, gflist02_c)
 
         
@@ -258,7 +258,7 @@ def main():
         for name, data in pickle_dict.iteritems():
             with open(pickle_root+name, 'w') as f:
                 pickle.dump(data, f)
-        
+
         print "complete"
 
     if options.load:
@@ -283,20 +283,6 @@ def main():
         
         print "complete."
         
-        for d in data004[-4:]:
-            print '(ap)^2:', d.apSq
-            print 'mu^2:', d.mu*d.mu
-            print 'Lambda_A:', d.Lambda_A
-            print '  Lambda_V:', d.Lambda_V
-            print ''
-            
-            print 'Zs:'
-            print d.fourquark_Zs['gg'], '+/-\n', d.fourquark_sigmaJK['gg']
-            print '\n'
-            
-        for d in data008[-3], data006[-3], data004[-3]:
-            print '(ap)^2:', d.apSq
-            print 'mu^2:', d.mu*d.mu
 
     # Plots.
     if options.plot:

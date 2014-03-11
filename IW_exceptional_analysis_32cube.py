@@ -131,7 +131,29 @@ def main():
         with open(root+'/IWf_exceptional_008.pkl', 'r') as f:
             data008 = pickle.load(f)
             
-        for d in data004[-2:]:
+        for d in data004[-2:-1]:
+            print '(ap)^2:', d.apSq
+            print 'mu^2:', d.mu*d.mu
+            print 'Lambda_A:', d.Lambda_A, 
+            print '  Lambda_V:', d.Lambda_V
+            print ''
+            
+            print 'Zs:'
+            print d.fourquark_Zs, '+/-\n', d.fourquark_sigmaJK
+            print '\n\n'
+            
+        for d in data006[-2:-1]:
+            print '(ap)^2:', d.apSq
+            print 'mu^2:', d.mu*d.mu
+            print 'Lambda_A:', d.Lambda_A, 
+            print '  Lambda_V:', d.Lambda_V
+            print ''
+            
+            print 'Zs:'
+            print d.fourquark_Zs, '+/-\n', d.fourquark_sigmaJK
+            print '\n\n'
+            
+        for d in data008[-2:-1]:
             print '(ap)^2:', d.apSq
             print 'mu^2:', d.mu*d.mu
             print 'Lambda_A:', d.Lambda_A, 
@@ -147,6 +169,17 @@ def main():
 
         print "Performing pole subtractions...",
         map(pole_fits.pole_subtract_Data2, data004, data006, data008)
+        print "Results of pole subtraction:"
+        for d in data004[-2:-1]:
+            print '(ap)^2:', d.apSq
+            print 'mu^2:', d.mu*d.mu
+            print 'Pole coefficients:'
+            print d.polefit_params.a
+            print 'am:', d.m
+            print 'Zinv:'
+            print d.Zinv
+            print 'Zinv_sub:'
+            print d.Zinv_sub
         # Cobble together bits of Zinv and return Z for each m.
         for x in data004, data006, data008:
             map(m.Zsub, x)

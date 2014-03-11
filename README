@@ -39,5 +39,15 @@ IW_exceptional_analysis_32cube.py -
     5x5 Delta S=2 analysis on fine IW lattices. Exceptional schemes.
 
 IW_NE_printout.py -
-    Results printout for 5x5 NE analysis.
+    Results printout for 5x5 NE analysis. (g,g)-scheme
+
+IW_NEq_printout.py -
+    Results printout for 5x5 NE analysis. (q,q)-scheme
+
+IW_bilinear_analysis.py -
+    Computing Z_S and Z_P for NE schemes. 
+    Results in IW_bilinears_note.pdf on individual posting.
+
+IW_exceptional_2014.py -
+    Study of pole terms.
 

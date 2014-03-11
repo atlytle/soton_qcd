@@ -100,27 +100,92 @@ def plot_chiral_extrap_Zinv(data_, pspec, O, P, legend_spec, save=False):
     legend = ()
     
     p.figure()
-    p.title('$24^3$ IW - exceptional')
+    #p.title('$24^3$ IW - exceptional')
     p.xlabel('$am$')
     p.ylabel('$(Z^{{-1}})_{0}$'.format('{'+label+'}'), fontsize=16)
     data = [d[pspec] for d in data_]
-    for d in data:
+    for d in data[1:]:
         x, y, s = d.m, d.Zinv[O][P], d.Zinv_sigmaJK[O][P]
-        p.errorbar(x, y, s, fmt='bo')
+        tmp = p.errorbar(x, y, s, fmt='bs', ms=10)
+    legend += tmp[0],
+    for d in data[1:]:
         x, y, s = d.m, d.Zinv_sub[O,P], d.Zinv_sub_sigma[O][P]
-        p.errorbar(x, y, s, fmt='ko')
+        tmp = p.errorbar(x, y, s, fmt='ko', ms=10)
+    legend += tmp[0],
+    for d in data[0],:
+        x, y, s = d.m, d.Zinv_sub[O,P], d.Zinv_sub_sigma[O][P]
+        p.errorbar(x, y, s, fmt='kv', ms=10)
     # Assumes chiral data w/ fit parameters is first element.
     d = data[0]
+    pole = data[1].polefit_params.a # Hacky.
     x = np.linspace(-d.mres, 0.02)
-    tmp = p.plot(x, d.Zinvfit.a[O][P] + d.Zinvfit.b[O][P]*(x+d.mres), 'b--')
-    legend += tmp[0],
-    tmp = p.plot(x, d.Zinv_subfit.a[O][P] + d.Zinv_subfit.b[O][P]*(x+d.mres), 'k-')
-    legend += tmp[0],
+    #tmp = p.plot(x, d.Zinvfit.a[O][P] + d.Zinvfit.b[O][P]*(x+d.mres), 'b--')
+    #tmp = p.plot(x, d.Zinvfit.a[O][P] + d.Zinvfit.b[O][P]*(x+d.mres) +\
+    #             pole[O][P]/(x+d.mres), 'b--')
+    #legend += tmp[0],
+    tmp = p.plot(x, d.Zinv_subfit.a[O][P] + d.Zinv_subfit.b[O][P]*(x+d.mres), 'k--')
+    #legend += tmp[0],
     p.legend(legend, legend_spec, 'best')
     if save:
-        root = '/Users/atlytle/Dropbox/TeX_docs/soton'\
-               '/SUSY_BK/exceptional/figs/'
+        #root = '/Users/atlytle/Dropbox/TeX_docs/soton/SUSY_BK/exceptional/figs/'
+        root = '/Users/atlytle/Dropbox/LATT_2013/proceeding/figs/'
         p.savefig(root + 'Zinv_sub_{0}_exceptional_24cube.pdf'.format(label))
+    else:
+        p.show()
+        
+def plot_chiral_extrap_Zinv_SUSY(data_, pspec, O, P, legend_spec, save=False):
+    '''Pull out data at a given momentum (pspec) and plot vs. am.
+    
+    This is presented in the SUSY basis and is admittedly hacky.'''
+    
+    label = str(O+1) + str(P+1)
+    legend = ()
+    
+    p.figure()
+    #p.title('$24^3$ IW - exceptional')
+    p.xlabel('$am$')
+    p.ylabel('$(Z^{{-1}})_{0}$'.format('{'+label+'}'), fontsize=16)
+    data = [d[pspec] for d in data_]
+    
+    # Convert to SUSY basis.  Note scaling the errors in this way is
+    # only valid in the 45 SUSY subbasis.
+    for d in data:
+        d.Zinv_SUSY = m.convert2SUSY(d.Zinv)
+        d.Zinv_SUSY_sigmaJK = abs(m.convert2SUSY(d.Zinv_sigmaJK))  # See note.
+        d.Zinv_sub_SUSY = m.convert2SUSY(d.Zinv_sub)
+        d.Zinv_sub_SUSY_sigma = abs(m.convert2SUSY(d.Zinv_sub_sigma))  # See note.
+    
+    for d in data[0],:
+        d.Zinv_subfit.a_SUSY = m.convert2SUSY(d.Zinv_subfit.a)
+        d.Zinv_subfit.b_SUSY = m.convert2SUSY(d.Zinv_subfit.b)
+        
+    for d in data[1:]:
+        x, y, s = d.m, d.Zinv_SUSY[O][P], d.Zinv_SUSY_sigmaJK[O][P]
+        tmp = p.errorbar(x, y, s, fmt='bs', ms=10)
+    legend += tmp[0],
+    for d in data[1:]:
+        x, y, s = d.m, d.Zinv_sub_SUSY[O,P], d.Zinv_sub_SUSY_sigma[O][P]
+        tmp = p.errorbar(x, y, s, fmt='ko', ms=10)
+    legend += tmp[0],
+    for d in data[0],:
+        x, y, s = d.m, d.Zinv_sub_SUSY[O,P], d.Zinv_sub_SUSY_sigma[O][P]
+        p.errorbar(x, y, s, fmt='kv', ms=10)
+    # Assumes chiral data w/ fit parameters is first element.
+    d = data[0]
+    pole = data[1].polefit_params.a # Hacky.
+    x = np.linspace(-d.mres, 0.02)
+    #tmp = p.plot(x, d.Zinvfit.a[O][P] + d.Zinvfit.b[O][P]*(x+d.mres), 'b--')
+    #tmp = p.plot(x, d.Zinvfit.a[O][P] + d.Zinvfit.b[O][P]*(x+d.mres) +\
+    #             pole[O][P]/(x+d.mres), 'b--')
+    #legend += tmp[0],
+    tmp = p.plot(x, d.Zinv_subfit.a_SUSY[O][P] + \
+                    d.Zinv_subfit.b_SUSY[O][P]*(x+d.mres), 'k--')
+    #legend += tmp[0],
+    p.legend(legend, legend_spec, 'best')
+    if save:
+        #root = '/Users/atlytle/Dropbox/TeX_docs/soton/SUSY_BK/exceptional/figs/'
+        root = '/Users/atlytle/Dropbox/LATT_2013/proceeding/figs/'
+        p.savefig(root + 'Zinv_sub_SUSY_{0}_exceptional_24cube.pdf'.format(label))
     else:
         p.show()
         
@@ -253,8 +318,10 @@ def main():
             #plot_data([data_0_3pt, data_0_sub], O, P, legend_spec, options.save)
             #plot_chiral_extrap([data_0_3pt, data_005, data_01, data_02, data_03],
             #                    4,O,P)
-            plot_chiral_extrap_Zinv([data_sub, data_005, data_01, data_02], 
-                                    -1, O, P, ('naive','sub'), options.save)
+            #plot_chiral_extrap_Zinv([data_sub, data_005, data_01, data_02], 
+            #                        -1, O, P, ('raw','subtracted'), options.save)
+            plot_chiral_extrap_Zinv_SUSY([data_sub, data_005, data_01, data_02], 
+                                    -1, O, P, ('raw','subtracted'), options.save)
         
     return 0
     

@@ -26,7 +26,11 @@ def single_double_pole_fit(xarr, yarr, earr):
 
     p1, success = optimize.leastsq(errfunc, p0, args=(xarr,yarr,earr),
                                    full_output=0)
-    return p1
+    # Compute chi^2 of the fit.
+    trialfunc = lambda x: fitfunc(p1,x)
+    chi_sq= chisq(xarr, yarr, earr, trialfunc)
+    
+    return p1, chi_sq
 
 def double_pole_fit(xarr, yarr, earr):
     '''Fit data to form A/x^2 + B + C*x'''
@@ -36,8 +40,48 @@ def double_pole_fit(xarr, yarr, earr):
 
     p1, success = optimize.leastsq(errfunc, p0, args=(xarr,yarr,earr),
                                    full_output=0)
-    return p1
+                                   
+    # Compute chi^2 of the fit.
+    trialfunc = lambda x: fitfunc(p1,x)
+    chi_sq= chisq(xarr, yarr, earr, trialfunc)
+    
+    return p1, chi_sq
+    
+def chisq(xarr, yarr, earr, trialfunc):
+    return sum([((y-trialfunc(x))/err)**2 
+                for x, y, err in zip(xarr, yarr, earr)])
+                
+def single_double_nocst_fit(xarr, yarr, earr):
+    '''Fit data to form A/x^2 + B/x + C*x'''
+    fitfunc = lambda p, x: p[0]/(x*x) + p[1]/x + p[2]*x
+    errfunc = lambda p, x, y, err: (y - fitfunc(p,x))/err
+    p0 = [1., 1., 1.]  # Initial guess.
 
+    p1, success = optimize.leastsq(errfunc, p0, args=(xarr,yarr,earr),
+                                   full_output=0)
+                                   
+    # Compute chi^2 of the fit.
+    trialfunc = lambda x: fitfunc(p1,x)
+    chi_sq= chisq(xarr, yarr, earr, trialfunc)
+    
+    return p1, chi_sq
+    
+def single_double_nolin_fit(xarr, yarr, earr):
+    '''Fit data to form A/x^2 + B/x + C'''
+    fitfunc = lambda p, x: p[0]/(x*x) + p[1]/x + p[2]
+    errfunc = lambda p, x, y, err: (y - fitfunc(p,x))/err
+    p0 = [1., 1., 1.]  # Initial guess.
+
+    p1, success = optimize.leastsq(errfunc, p0, args=(xarr,yarr,earr),
+                                   full_output=0)
+                                   
+    # Compute chi^2 of the fit.
+    trialfunc = lambda x: fitfunc(p1,x)
+    chi_sq= chisq(xarr, yarr, earr, trialfunc)
+    
+    return p1, chi_sq
+    
+    
 def single_pole_fit(xarr, yarr, earr):
     '''Fit data to form A/x + B +C*x'''
     fitfunc = lambda p, x: p[0]/x + p[1] + p[2]*x
@@ -46,7 +90,12 @@ def single_pole_fit(xarr, yarr, earr):
 
     p1, success = optimize.leastsq(errfunc, p0, args=(xarr,yarr,earr),
                                    full_output=0)
-    return p1
+                                   
+    # Compute chi^2 of the fit.
+    trialfunc = lambda x: fitfunc(p1,x)
+    chi_sq= chisq(xarr, yarr, earr, trialfunc)
+    
+    return p1, chi_sq
 
 def linear_fit(xarr, yarr, earr):
     '''Fit data to form A + B*x'''
@@ -92,15 +141,15 @@ def pole_subtract_Data2(*Dat):
     for d in Dat:
         assert isinstance(d, Data)
     Dat = list(Dat) 
-    d = Dat[0]
     # Multiply by am and find intercept. 
     mres = Dat[0].mres  
     points = [(mres + d.m, (mres + d.m)*d.Zinv, (mres + d.m)*d.Zinv_sigmaJK)
              for d in Dat]
     fit = line_fit2(points)
     for d in Dat:
+        d.polefit_params = fit  # Save these parameters.
         d.Zinv_sub = d.Zinv - fit.a/(d.m + mres)
-        d.Zinv_sub_sigma = sqrt(d.Zinv_sigmaJK**2 + (fit.sig_a/(d.m+mres))**2)
+        d.Zinv_sub_sigma = sqrt(d.Zinv_sigmaJK**2)# + (fit.sig_a/(d.m+mres))**2)
         
     # Jackknife values.
     # This proceeds in a few steps. First we calculate the fit parameter 'a'

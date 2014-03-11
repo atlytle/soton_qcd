@@ -76,23 +76,6 @@ def bilinear_Lambdas(Data):
     tmp = reduce(dot, [qmuGmu5, Gc[15], dw.slash(aq)]).real
     Data.Vq5 = trace(tmp*norm)/Data.apSq
     Data.Vq = (Data.Vq + Data.Vq5)/2 #fix
-    
-    # Z-factors.
-    def Z_S(Lambda, Lambda_vec):
-        'Lambda_vec depends on how Zq is determined (see usage below).'
-        return Lambda_vec/Lambda[0]
-        
-    Data.Z_S = dict(g=None, q=None)
-    Data.Z_S['g'] = Z_S(Data.Lambda, Data.Lambda_VpA)
-    Data.Z_S['q'] = Z_S(Data.Lambda, Data.Vq)
-    
-    def Z_P(Lambda, Lambda_vec):
-        'Lambda_vec depends on how Zq is determined (see usage below).'
-        return Lambda_vec/Lambda[15]
-        
-    Data.Z_P = dict(g=None, q=None)
-    Data.Z_P['g'] = Z_P(Data.Lambda, Data.Lambda_VpA)
-    Data.Z_P['q'] = Z_P(Data.Lambda, Data.Vq)
 
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),
@@ -143,31 +126,7 @@ def bilinear_LambdaJK(Data):
         return trace(tmp*norm)/Data.apSq
     Data.Vq_JK = [(Vq(amp)+Vq5(amp))/2 for amp in amputatedJK]
     Data.Vq_sigmaJK = JKsigma(Data.Vq_JK, Data.Vq)
-    
-    # Z-factors.
-    def Z_S(Lambda, Lambda_vec):
-        'Lambda_vec depends on how Zq is determined (see usage below).'
-        return Lambda_vec/Lambda[0]
-        
-    Data.Z_S_JK = dict(g=None, q=None)
-    Data.Z_S_sigmaJK = dict(g=None, q=None)
-    Data.Z_S_JK['g'] = map(Z_S, Data.LambdaJK, Data.Lambda_VpA_JK)
-    Data.Z_S_JK['q'] = map(Z_S, Data.LambdaJK, Data.Vq_JK)
-    for scheme in 'g', 'q':
-        Data.Z_S_sigmaJK[scheme] = JKsigma(Data.Z_S_JK[scheme], Data.Z_S[scheme])
-
-    def Z_P(Lambda, Lambda_vec):
-        'Lambda_vec depends on how Zq is determined (see usage below).'
-        return Lambda_vec/Lambda[15]
-        
-    Data.Z_P_JK = dict(g=None, q=None)
-    Data.Z_P_sigmaJK = dict(g=None, q=None)
-    Data.Z_P_JK['g'] = map(Z_P, Data.LambdaJK, Data.Lambda_VpA_JK)
-    Data.Z_P_JK['q'] = map(Z_P, Data.LambdaJK, Data.Vq_JK)
-    for scheme in 'g', 'q':
-        Data.Z_P_sigmaJK[scheme] = JKsigma(Data.Z_P_JK[scheme], Data.Z_P[scheme])
-    
-    
+ 
 def bilinear_LambdaBoot(Data):
     pass
 
@@ -302,12 +261,12 @@ def fourquark_Zs(Data):
     Data.fourquark_Lambda = (fourquark_proj_g(amputated).real)*norm#*chiral_mask
     VpA = Data.Lambda_VpA  # Requires prior bilinear calculation.
     Vq = Data.Vq  # Requires prior bilinear calculation.
-    Data.Zinv = dot(Data.fourquark_Lambda, inv(F_gg))
+    Data.Zinv = dot(Data.fourquark_Lambda, inv(F_gg))/(VpA*VpA)
     Data.Zinv_chi = dot(Data.fourquark_Lambda*chiral_mask, inv(F_gg))
     Data.Z_chi = inv(Data.Zinv_chi)
     Data.thing = dot(Data.Z_chi, Data.Zinv)
-    Data.Z_tmp = inv(Data.Zinv*chiral_mask)
-    Data.fourquark_Zs['gg'] = Data.Z_tmp*(VpA)*(VpA)  # (g, g)
+    Data.Z_tmp = inv(Data.Zinv)#*chiral_mask
+    Data.fourquark_Zs['gg'] = Data.Z_tmp  # (g, g)
     Data.fourquark_Zs['gq'] = Data.Z_tmp*(Vq)*(Vq)  # (g, q)
     
     # (q, Y) - schemes, deltaS = 2 basis
@@ -315,13 +274,13 @@ def fourquark_Zs(Data):
     Data.fourquark_Lambda_q = (fourquark_proj_q(amputated, aq, apSq).real)*\
                                                 norm#*chiral_mask
     #Z_tmp = dot(F_qq, inv(Data.fourquark_Lambda_q))
-    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))
+    Data.Zinv_q = dot(Data.fourquark_Lambda_q, inv(F_qq))/(Vq*Vq)
     Data.Zinv_chi_q = dot(Data.fourquark_Lambda_q*chiral_mask, inv(F_qq))
     Data.Z_chi_q = inv(Data.Zinv_chi_q)
     Data.thing_q = dot(Data.Z_chi_q, Data.Zinv_q)
     Data.Z_tmpq = inv(Data.Zinv_q)
     Data.fourquark_Zs['qg'] = Data.Z_tmpq*(VpA)*(VpA) # (q, g)
-    Data.fourquark_Zs['qq'] = Data.Z_tmpq*(Vq)*(Vq)    # (q, q)
+    Data.fourquark_Zs['qq'] = Data.Z_tmpq  # (q, q)
 
 def fourquark_ZsJK(Data):
     amputatedJK = map(amputate_fourquark, JKsample(Data.inprop_list),
@@ -350,6 +309,11 @@ def fourquark_ZsJK(Data):
                                                         norm#*chiral_mask
     Data.Lambda_JK_q = map(Lambda_q, amputatedJK)
     Data.Lambda_sigmaJK_q = JKsigma(Data.Lambda_JK_q, Data.fourquark_Lambda_q)
+    
+    # Zinv_q.
+    Zinv_q = lambda Lambda, Vq: dot(Lambda, inv(F_qq))/(Vq*Vq)
+    Data.Zinv_q_JK = map(Zinv_q, Data.Lambda_JK_q, Data.Vq_JK)
+    Data.Zinv_q_sigmaJK = JKsigma(Data.Zinv_q_JK, Data.Zinv_q)
     
     # Z^chi Lambda_q^f = "thing_q".
     thing_q = lambda x: reduce(dot, [F_qq, inv(Lambda_q(x)*chiral_mask),

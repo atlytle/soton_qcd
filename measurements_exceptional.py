@@ -131,6 +131,18 @@ def Zsub(Data):
     Data.Zsub_JK = map(invert, Data.Zinv_JKexpand, Data.Zinv_subJK)
     Data.Zsub_sigmaJK = JKsigma(Data.Zsub_JK, Data.Zsub)
     
+# Basis conversion matrix, O^{susy} = M Q^{ren}.
+M = np.array([
+[1.,0,0,0,0],
+[0,0,0,1.,0],
+[0,0,0,-.5,.5],
+[0,0,1.,0,0],
+[0,-.5,0,0,0]])
+
+def convert2SUSY(Z):
+    '''Convert Z (or Z^-1) from the renormalization to SUSY basis.'''
+    return dot(M, dot(Z, inv(M)))
+    
     
     
     
