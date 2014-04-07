@@ -51,3 +51,9 @@ IW_bilinear_analysis.py -
 IW_exceptional_2014.py -
     Study of pole terms.
 
+Zq_study.py -
+    Examining trying to extract Z_V from the propagator and Lambda_V.
+
+IW_E_stepscale.py -
+    Step-scaling analysis on IW exceptional 24^3 and 32^3 data.
+
