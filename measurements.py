@@ -232,9 +232,23 @@ def proj_sigma(amputated, aq):
         result += tensordot(sdq[mu], tmp, ([0,1], [1,0]))
     return result
 
+def proj_sigma5(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q g5 x sigma.q g5 projector."
+    result = 0
+    sdq5 = dw.sigma_dot_q5(aq, color=True)
+    for mu in range(4):
+        tmp = tensordot(sdq5[mu], amputated, ([0,1], [1,0]))
+        result += tensordot(sdq5[mu], tmp, ([0,1], [1,0]))
+    return result
+
 def proj_sigma_mix(amputated, aq):
     "Contract amputated fourquark correlator w/ sigma.q x sigma.q mixed."
     proj = dw.sigmaMixArray(aq)
+    return np.sum(proj*amputated)
+
+def proj_sigma5_mix(amputated, aq):
+    "Contract amputated fourquark correlator w/ sigma.q x sigma.q mixed."
+    proj = dw.sigma5MixArray(aq)
     return np.sum(proj*amputated)
 
 def fourquark_proj_g(amputated):
