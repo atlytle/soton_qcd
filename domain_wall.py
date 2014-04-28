@@ -137,6 +137,25 @@ def sigmaMixArray(aq):
         r[i][j][k][l] = sigmaMixProj(i, j, k, l)
     return r
 
+def sigma5MixArray(aq):
+    "Color-mixed sigma.q g5 x sigma.q g5 projectors."
+    sdq5 = sigma_dot_q5(aq, color=False)
+    kd = np.identity(3)
+
+    def sigma5MixProj(ii, jj, kk, ll):
+        #global q, kd
+        i, a = switch(ii)
+        j, b = switch(jj)
+        k, c = switch(kk)
+        l, d = switch(ll)
+        sdq5_dot_sdq5=sum([sdq5[mu][j][i]*sdq5[mu][l][k] for mu in range(4)])
+        return (sdq5_dot_sdq5)*kd[d][a]*kd[b][c]
+
+    r = np.zeros((12, 12, 12, 12), complex) # !
+    for i, j, k, l in product(range(12), repeat=4):
+        r[i][j][k][l] = sigma5MixProj(i, j, k, l)
+    return r
+
 
 # Momentum definitions.
 def sgn0(x):
