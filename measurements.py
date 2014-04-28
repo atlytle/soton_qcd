@@ -247,7 +247,7 @@ def proj_sigma_mix(amputated, aq):
     return np.sum(proj*amputated)
 
 def proj_sigma5_mix(amputated, aq):
-    "Contract amputated fourquark correlator w/ sigma.q x sigma.q mixed."
+    "Contract amputated fourquark correlator w/ sigma.q g5 x sigma.q g5 mixed."
     proj = dw.sigma5MixArray(aq)
     return np.sum(proj*amputated)
 
@@ -274,10 +274,14 @@ def fourquark_proj_q(amputated, aq, apSq):
                                  proj_q5mix(amp, aq))/apSq  # SS-PP
     proj_TT_mx = lambda amp: proj_sigma_mix(amp, aq)/apSq   # SS+PP
     proj_TT = lambda amp: proj_sigma(amp, aq)/apSq
+    proj_TT5_mx = lambda amp: proj_sigma5_mix(amp, aq)/apSq
+    proj_TT5 = lambda amp: proj_sigma5(amp, aq)/apSq
+
  
     def projectors(x):
         return [proj_BK(x), proj_VVmAA(x), proj_VVmAA_mx(x),
-                proj_TT_mx(x), proj_TT(x)]
+                (proj_TT_mx(x)+proj_TT5_mx(x))/2, 
+                (proj_TT(x) + proj_TT5(x))/2]
 
     cfncs = [G_VVpAA(amputated), G_VVmAA(amputated), G_SSmPP(amputated),
              G_SSpPP(amputated), G_TT(amputated)]

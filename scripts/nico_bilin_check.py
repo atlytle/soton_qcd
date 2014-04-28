@@ -10,7 +10,7 @@ import pyNPR as npr
 import measurements as m
 
 ar = np.array
-np.set_printoptions(precision=2, suppress=True)
+np.set_printoptions(precision=5, suppress=True)
 
 # 24^3 x 64
 plist = [(-4,0,4,0)]
@@ -25,6 +25,7 @@ def calc_Zs(Data):
     Data.load()
     m.bilinear_Lambdas(Data)
     #m.bilinear_LambdaJK(Data)
+    m.fourquark_Zs(Data)
     Data.clear()
     return Data
 
@@ -41,6 +42,8 @@ def main():
     print 'done.'
     
     d = data_005[0]
+
+    # Bilinears.
     print 'S -', d.Lambda[0]
     print 'V -', d.Lambda_V
     print 'A -', d.Lambda_A
@@ -48,6 +51,11 @@ def main():
     print ''
     print 'Vq -', d.Vq
     print 'Aq -', d.Vq5
+
+    print ''
+    # Fourquark.
+    print 'Z^{-1} in (q,q) scheme:'
+    print d.Zinv_q
 
 if __name__ == "__main__":
     sys.exit(main())
