@@ -175,6 +175,13 @@ def sigma(mu, nu, color=False):
         g = (Gc[1], Gc[2], Gc[4], Gc[8])
 
     return (1/2.)*(np.dot(g[mu], g[nu]) - np.dot(g[nu], g[mu]))
+
+def sigma5(mu, nu, color=False):
+    "sigma^{mu nu} gamma_5 in spin(-color) basis."
+    g5 = G[15]
+    if color:
+        g5 = Gc[15]
+    return np.dot(sigma(mu,nu,color), g5)
     
 def sigma_dot_q(aq, color=False):
     "Four-list sigma^{mu nu} q_{nu} in spin(-color) basis."
@@ -182,6 +189,13 @@ def sigma_dot_q(aq, color=False):
     for mu in range(4):
         sdq[mu] = sum([sigma(mu, nu, color)*aq[nu] for nu in range(4)])
     return sdq
+
+def sigma_dot_q5(aq, color=False):
+    "Four-list q_nu sigma^{mu nu} gamma_5."
+    sdq5 = [0, 0, 0, 0]
+    for mu in range(4):
+        sdq5[mu] = sum([sigma5(mu, nu, color)*aq[nu] for nu in range(4)])
+    return sdq5
 
 def aq(ap1, ap2):
     "Return tuple ap1 - ap2."
