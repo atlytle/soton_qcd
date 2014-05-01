@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plot
 from scipy import interpolate
 from numpy import dot
 from numpy.linalg import inv
