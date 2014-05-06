@@ -49,7 +49,7 @@ def main():
     print 'A -', d.Lambda_A
     print 'P -', d.Lambda[15]
     print ''
-    print 'Vq -', d.Vq
+    print 'Vq -', d.Vq_
     print 'Aq -', d.Vq5
 
     print ''

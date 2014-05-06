@@ -96,7 +96,8 @@ def bilinear_Lambdas(Data):
     qmuGmu5 = sum([aq[i]*Gmu5[i] for i in range(4)])
     tmp = reduce(dot, [qmuGmu5, Gc[15], dw.slash(aq)]).real
     Data.Vq5 = trace(tmp*norm)/Data.apSq
-    #Data.Vq = (Data.Vq + Data.Vq5)/2 #fix
+    Data.Vq_ = Data.Vq
+    Data.Vq = (Data.Vq + Data.Vq5)/2
 
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),

@@ -5,7 +5,7 @@ from numpy.linalg import inv
 
 from pyNPR import Data
 from measurements import F_gg, F_qq, chiral_mask
-from combined_analysis import propagate_errors
+#from combined_analysis import propagate_errors
 
 def line_fit_2pt(p1, p2):
     '''Simple test function.'''
