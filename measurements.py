@@ -84,9 +84,10 @@ def bilinear_Lambdas(Data):
                        Data.Lambda[11] + Data.Lambda[7])*(1./8)
     Data.Lambda_VmA = 2*(Data.Lambda_V - Data.Lambda_A)/\
                         (Data.Lambda_V + Data.Lambda_A)
-    #Data.Lambda_VmA = (Data.Lambda_V - Data.Lambda_A)
     Data.Lambda_PmS = 2*(Data.Lambda[15] - Data.Lambda[0])/\
                         (Data.Lambda[15] + Data.Lambda[0])
+    Data.Lambda_T = (Data.Lambda[3] + Data.Lambda[5] + Data.Lambda[6] +
+                     Data.Lambda[9] + Data.Lambda[10] + Data.Lambda[12])/6.
     # For the (X, q) schemes.
     aq = Data.aq
     Gmu = (amputated[1], amputated[2], amputated[4], amputated[8])
@@ -121,6 +122,9 @@ def bilinear_LambdaJK(Data):
         return 2*(V(Lambda) - A(Lambda))/(V(Lambda) + A(Lambda))
     def PmS(Lambda):
         return 2*(Lambda[15] - Lambda[0])/(Lambda[15] + Lambda[0])
+    def T(Lambda):
+        return (Lambda[3] + Lambda[5] + Lambda[6] + 
+                Lambda[9] + Lambda[10] + Lambda[12])/6.
         
     Data.Lambda_VpA_JK = map(VpA, Data.LambdaJK)
     Data.Lambda_VpA_sigmaJK = JKsigma(Data.Lambda_VpA_JK, Data.Lambda_VpA)
@@ -133,6 +137,8 @@ def bilinear_LambdaJK(Data):
     Data.Lambda_VmA_sigmaJK = JKsigma(Data.Lambda_VmA_JK, Data.Lambda_VmA)
     Data.Lambda_PmS_JK = map(PmS, Data.LambdaJK)
     Data.Lambda_PmS_sigmaJK = JKsigma(Data.Lambda_PmS_JK, Data.Lambda_PmS)
+    Data.Lambda_T_JK = map(T, Data.LambdaJK)
+    Data.Lambda_T_sigmaJK = JKsigma(Data.Lambda_T_JK, Data.Lambda_T)
     
     # For the (X, q) schemes.
     aq = Data.aq
