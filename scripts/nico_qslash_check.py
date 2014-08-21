@@ -1,4 +1,7 @@
-'''Quick check of Nicolas' code.  Email Apr 15, 2014.'''
+'''Quick check of Nicolas' code.  Email Apr 15, 2014.
+
+Added tensor result Aug 21, 2014.
+'''
 
 import sys
 sys.path.append('../')
@@ -46,6 +49,7 @@ def main():
     # Bilinears.
     print 'S -', d.Lambda[0]
     print 'V -', d.Lambda_V
+    print 'T -', d.Lambda_T
     print 'A -', d.Lambda_A
     print 'P -', d.Lambda[15]
     print ''
