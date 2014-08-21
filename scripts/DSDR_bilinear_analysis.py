@@ -1,4 +1,5 @@
 import sys
+sys.path.append('../')
 import numpy as np
 import pylab as p
 from multiprocessing import Pool
@@ -8,7 +9,8 @@ import domain_wall as dw
 import pyNPR as npr
 import measurements as m
 
-np.set_printoptions(precision=10)
+np.set_printoptions(precision=4)
+ar = np.array
 
 # Parameters.
 plist0042 = [(-3, 0, 3, 0), (-4, 0, 4, 0), (-4, 0, 4, 0), (-4, 0, 4, 0),
@@ -87,7 +89,12 @@ def to_gnuplot(data):
     #with open(root+'DSDR_bilins.dat', 'w') as f:
     #    f.write(np.transpose(dat))
     np.savetxt(root+'DSDR_bilins.dat', np.transpose(dat))
-    
+
+def erep(x,dx,dec=4):
+    "Format (value, error) pairs as #.##(#)."
+    dx = dx*(10**dec)
+    fspec = '{0:.'+str(dec)+'f}({1:.0f})'  # '{0:.#f}({1:.0f})'
+    return fspec.format(x,dx)
     
 def main():
     
@@ -104,24 +111,73 @@ def main():
     print "Computing Zs...",
     pool = Pool()
     data001 = pool.map_async(calc_Zs, data001).get()
-    data0042 = pool.map_async(calc_Zs, data0042).get()
+    #data0042 = pool.map_async(calc_Zs, data0042).get()
     pool.close()
     pool.join()
-    print "chiral limit...",
-    data0 = map(fits.line_fit_bilinear_Lambdas, data001, data0042)
     print "complete."
+    #print "chiral limit...",
+    #data0 = map(fits.line_fit_bilinear_Lambdas, data001, data0042)
+    #print "complete."
     
-    print [d.apSq for d in data001]
+    #print ar([d.apSq for d in data001])
+    print "mu [GeV]"
+    print ar([d.mu for d in data001])
     print ''
-    print [d.Lambda_V for d in data001]
-    print [d.Lambda_A for d in data001]
+    print 'Lambda_V'
+    print ar([d.Lambda_V for d in data001])
+    print ar([d.Lambda_V_sigmaJK for d in data001])
+    #print map(erep, [d.Lambda_V for d in data001],
+    #                    [d.Lambda_V_sigmaJK for d in data001])
     print ''
-    print [d.Lambda[0] for d in data001]
-    print [d.Lambda[15] for d in data001]
+
+    #print ar([d.Lambda_A for d in data001])
+    print 'Lambda_Vq'
+    print ar([d.Vq for d in data001])
+    print ar([d.Vq_sigmaJK for d in data001])
+
+    print ''
+    print 'Lambda_S'
+    print ar([d.Lambda[0] for d in data001])
+    print ar([d.Lambda_sigmaJK[0] for d in data001])
+
+    #print ar([d.Lambda[15] for d in data001])
+    print ''
+    print 'Lambda_T'
+    print ar([d.Lambda_T for d in data001])
+    print ar([d.Lambda_T_sigmaJK for d in data001])
+
+    print ''
+
+    print 'Z_S/Z_A [g]'
+    print ar([d.Z_S['g'] for d in data001])
+    print ar([d.Z_S_sigmaJK['g'] for d in data001])
+
+    print ''
+
+    print 'Z_S/Z_A [q]'
+    print ar([d.Z_S['q'] for d in data001])
+    print ar([d.Z_S_sigmaJK['q'] for d in data001])
+
+    print ''
+
+    print 'Z_T/Z_A [g]'
+    print ar([d.Z_T['g'] for d in data001])
+    print 10*ar([d.Z_T_sigmaJK['g'] for d in data001])/7  # Format hack.
+
+    print ''
+
+    print 'Z_T/Z_A [q]'
+    print ar([d.Z_T['q'] for d in data001])
+    print ar([d.Z_T_sigmaJK['q'] for d in data001])
+
+    print ''
+
+    #print 'Z_V/Z_A'
+    #print ar([d.Zs['g'][8] for d in data001])
     
     #plot_PmS(data0, save=True)
     #plot_VmA(data0, save=True)
-    to_gnuplot(data0)
+    #to_gnuplot(data0)
     
     return 0
 

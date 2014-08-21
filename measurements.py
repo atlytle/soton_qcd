@@ -100,6 +100,14 @@ def bilinear_Lambdas(Data):
     Data.Vq_ = Data.Vq
     Data.Vq = (Data.Vq + Data.Vq5)/2
 
+    # Z-factors.
+    Data.Z_S = dict(g=None, q=None)
+    Data.Z_T = dict(g=None, q=None)
+    Data.Z_S['g'] = Data.Lambda_VpA/Data.Lambda[0]
+    Data.Z_S['q'] = Data.Vq/Data.Lambda[0]
+    Data.Z_T['g'] = Data.Lambda_VpA/Data.Lambda_T
+    Data.Z_T['q'] = Data.Vq/Data.Lambda_T
+
 def bilinear_LambdaJK(Data):
     amputatedJK = map(amputate_bilinears, JKsample(Data.inprop_list),
                                           JKsample(Data.outprop_list),
@@ -154,6 +162,24 @@ def bilinear_LambdaJK(Data):
         return trace(tmp*norm)/Data.apSq
     Data.Vq_JK = [(Vq(amp)+Vq5(amp))/2 for amp in amputatedJK]
     Data.Vq_sigmaJK = JKsigma(Data.Vq_JK, Data.Vq)
+
+    # Z-factors.
+    Z_S = lambda Lambda, Lambda_vec: Lambda_vec/Lambda[0]
+    Data.Z_S_JK = dict(g=None, q=None)
+    Data.Z_S_sigmaJK = dict(g=None, q=None)
+    Data.Z_S_JK['g'] = map(Z_S, Data.LambdaJK, Data.Lambda_VpA_JK)
+    Data.Z_S_JK['q'] = map(Z_S, Data.LambdaJK, Data.Vq_JK)
+    Data.Z_S_sigmaJK['g'] = JKsigma(Data.Z_S_JK['g'], Data.Z_S['g'])
+    Data.Z_S_sigmaJK['q'] = JKsigma(Data.Z_S_JK['q'], Data.Z_S['q'])
+
+    Z_T = lambda Lambda_T, Lambda_vec: Lambda_vec/Lambda_T
+    Data.Z_T_JK = dict(g=None, q=None)
+    Data.Z_T_sigmaJK = dict(g=None, q=None)
+    Data.Z_T_JK['g'] = map(Z_T, Data.Lambda_T_JK, Data.Lambda_VpA_JK)
+    Data.Z_T_JK['q'] = map(Z_T, Data.Lambda_T_JK, Data.Vq_JK)
+    Data.Z_T_sigmaJK['g'] = JKsigma(Data.Z_T_JK['g'], Data.Z_T['g'])
+    Data.Z_T_sigmaJK['q'] = JKsigma(Data.Z_T_JK['q'], Data.Z_T['q'])
+
  
 def bilinear_LambdaBoot(Data):
     pass
